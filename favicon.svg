@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#1B1233"/>
+  <!-- ears (semi-erect, dark slate merle) -->
+  <path d="M8.6 13 L6.6 5.6 L13 9.6 Z" fill="#3B434F"/>
+  <path d="M23.4 13 L25.4 5.6 L19 9.6 Z" fill="#3B434F"/>
+  <path d="M7.4 6.8 L8.6 10.8 L10.4 8.8 Z" fill="#8A94A2"/>
+  <!-- head (silver-blue) -->
+  <path d="M8 13 Q16 8.5 24 13 Q25 21 19.5 26 Q16 27.6 12.5 26 Q7 21 8 13 Z" fill="#8A94A2"/>
+  <!-- tan cheek points -->
+  <path d="M9.6 17.5 Q11 20 12.8 21 Q11 21.8 9.6 20 Z" fill="#C0894E"/>
+  <path d="M22.4 17.5 Q21 20 19.2 21 Q21 21.8 22.4 20 Z" fill="#C0894E"/>
+  <!-- white blaze / muzzle -->
+  <path d="M14 12.4 Q16 10.8 18 12.4 L18.4 24 Q16 26.6 13.6 24 Z" fill="#FFF3E0"/>
+  <!-- almond eyes -->
+  <ellipse cx="12.3" cy="16.2" rx="1.7" ry="2" fill="#1E2229"/>
+  <ellipse cx="19.7" cy="16.2" rx="1.7" ry="2" fill="#1E2229"/>
+  <!-- nose -->
+  <ellipse cx="16" cy="22.4" rx="2" ry="1.5" fill="#1E2229"/>
+</svg>

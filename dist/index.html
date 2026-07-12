@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Angela Santurbano — Night Market</title>
+<meta name="description" content="Angela Santurbano is a builder PM who ships with AI. Wander an interactive night market — Franklin the Sheltie in tow — to explore her projects, writing, and ways to reach out.">
+<link rel="canonical" href="https://angelasanturbano.com/">
+<meta name="theme-color" content="#1B1233">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+<!-- Open Graph / social share -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Angela Santurbano">
+<meta property="og:url" content="https://angelasanturbano.com/">
+<meta property="og:title" content="Angela Santurbano — Night Market">
+<meta property="og:description" content="A builder PM who ships with AI. Wander the night market to explore projects, writing, and ways to say hi.">
+<meta property="og:image" content="https://angelasanturbano.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Angela's Night Market — a lantern-lit dusk market scene with Franklin the Sheltie.">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Angela Santurbano — Night Market">
+<meta name="twitter:description" content="A builder PM who ships with AI. Wander the night market to explore projects, writing, and ways to say hi.">
+<meta name="twitter:image" content="https://angelasanturbano.com/og.jpg">
+<meta name="twitter:creator" content="@angelasanturb">
+<meta name="author" content="Angela Santurbano">
+
+<!-- Structured data: who Angela is, for search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Angela Santurbano",
+  "jobTitle": "Product Manager",
+  "description": "Builder PM who ships with AI. Ten years of product at Block/Square, Meta, Brex, and Cocoon; currently deep in voice AI.",
+  "url": "https://angelasanturbano.com",
+  "image": "https://angelasanturbano.com/og.jpg",
+  "address": { "@type": "PostalAddress", "addressLocality": "San Francisco", "addressRegion": "CA", "addressCountry": "US" },
+  "knowsAbout": ["Artificial Intelligence", "Voice AI", "Product Management", "AI agents"],
+  "sameAs": [
+    "https://www.linkedin.com/in/angela-santurbano/",
+    "https://x.com/angelasanturb",
+    "https://frontierbuilds.substack.com",
+    "https://angelasanturbano.substack.com",
+    "https://alltheangels.substack.com"
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Karla:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night:#1B1233;
+    --amber:#FFB454;
+    --chili:#E8503A;
+    --jade:#3FA487;
+    --paper:#FFF4DE;
+    --ink:#2B1B2E;
+    --pink:#FF7BAC;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--night);
+    font-family:'Karla',sans-serif;
+    color:var(--paper);
+    overflow:hidden;
+  }
+  #stage{
+    position:fixed;inset:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  #frame{
+    position:relative;
+    width:min(100vw, calc(100vh * 16 / 9));
+    height:min(100vh, calc(100vw * 9 / 16));
+  }
+  canvas{
+    position:absolute;inset:0;width:100%;height:100%;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+    touch-action:none;
+  }
+  /* ---------- header sign ---------- */
+  #gate{
+    position:absolute;top:3.5%;left:0;right:0;
+    text-align:center;pointer-events:none;
+    z-index:3;
+  }
+  #gate .brand{
+    font-family:'Silkscreen',monospace;
+    font-size:clamp(14px, 2.6vw, 26px);
+    letter-spacing:.14em;
+    color:var(--amber);
+    /* dark contact shadow keeps the sign legible on both night and bright-day skies */
+    text-shadow:0 0 16px rgba(255,180,84,.5), 0 2px 3px rgba(24,10,4,.7), 0 0 4px rgba(24,10,4,.6);
+  }
+  #gate p{
+    margin-top:.5em;
+    font-size:clamp(10px, 1.3vw, 14px);
+    letter-spacing:.06em;
+    color:rgba(255,244,222,.85);
+    text-shadow:0 1px 3px rgba(24,10,4,.65);
+  }
+  #gate .fr{color:rgba(255,244,222,.62);font-style:italic}
+  /* ---------- skip link ---------- */
+  #skip{
+    position:absolute;top:3.5%;right:2.5%;z-index:6;
+    font-family:'Silkscreen',monospace;
+    font-size:clamp(9px,1.1vw,12px);
+    letter-spacing:.08em;
+    color:var(--night);
+    background:var(--amber);
+    border:none;cursor:pointer;
+    padding:.55em .9em;
+    box-shadow:0 3px 0 rgba(0,0,0,.45);
+  }
+  #skip:hover{background:var(--paper)}
+  #skip:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+  /* ---------- hint footer ---------- */
+  #hint{
+    position:absolute;bottom:2.5%;left:0;right:0;
+    text-align:center;pointer-events:none;z-index:3;
+    font-size:clamp(10px,1.25vw,14px);
+    letter-spacing:.05em;
+    color:rgba(255,244,222,.55);
+  }
+  #hint kbd{
+    font-family:'Silkscreen',monospace;
+    font-size:.85em;
+    color:var(--amber);
+  }
+  /* ---------- menu card panel ---------- */
+  #veil{
+    position:fixed;inset:0;z-index:8;
+    background:rgba(15,8,30,.55);
+    display:none;
+  }
+  #veil.open{display:block}
+  #card{
+    position:fixed;z-index:9;              /* viewport-relative, not the letterboxed frame */
+    left:50%;top:50%;
+    transform:translate(-50%,-46%) scale(.96);
+    opacity:0;
+    width:min(92vw, 460px);
+    max-height:85vh;
+    display:none;
+    flex-direction:column;
+    background:var(--paper);
+    color:var(--ink);
+    padding:26px;
+    border:3px solid var(--ink);
+    box-shadow:8px 8px 0 rgba(0,0,0,.45);
+    overflow:hidden;                       /* card frame stays put; inner body scrolls */
+    transition:transform .18s ease-out, opacity .18s ease-out;
+  }
+  #card.open{display:flex}
+  #card.shown{transform:translate(-50%,-50%) scale(1);opacity:1}
+  #cardBody{overflow-y:auto;min-height:0;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+  #card::before{
+    content:"";
+    position:absolute;top:10px;left:10px;right:10px;bottom:10px;
+    border:2px dashed rgba(43,27,46,.28);
+    pointer-events:none;
+  }
+  #card .stall-tag{
+    display:inline-block;
+    font-family:'Silkscreen',monospace;
+    font-size:11px;letter-spacing:.12em;
+    color:var(--paper);
+    padding:.4em .8em;margin-bottom:14px;
+  }
+  #card h2{
+    font-family:'Silkscreen',monospace;
+    font-size:clamp(16px,2vw,20px);
+    letter-spacing:.06em;
+    margin-bottom:6px;
+  }
+  #card .sub{
+    font-style:italic;color:rgba(43,27,46,.65);
+    margin-bottom:16px;font-size:14px;
+  }
+  #card ul{list-style:none}
+  #card li{
+    padding:12px 0;
+    border-top:1px solid rgba(43,27,46,.15);
+  }
+  #card li:first-child{border-top:none}
+  #card li b{font-weight:700}
+  #card li .note{
+    display:block;font-size:13.5px;
+    color:rgba(43,27,46,.7);margin-top:2px;
+  }
+  #card a{
+    color:var(--chili);font-weight:700;text-decoration:none;
+    border-bottom:2px solid rgba(232,80,58,.35);
+  }
+  #card a:hover{border-bottom-color:var(--chili)}
+  #card a:focus-visible{outline:3px solid var(--jade);outline-offset:2px}
+  #card p.bio{line-height:1.55;font-size:15px}
+  #card p.bio + p.bio{margin-top:10px}
+  #closeCard{
+    position:absolute;top:14px;right:14px;
+    font-family:'Silkscreen',monospace;
+    font-size:12px;
+    background:var(--ink);color:var(--paper);
+    border:none;cursor:pointer;
+    width:30px;height:30px;line-height:30px;
+    z-index:2;
+  }
+  #closeCard:hover{background:var(--chili)}
+  #closeCard:focus-visible{outline:3px solid var(--chili);outline-offset:2px}
+  @media (max-width:560px){
+    #card{width:92vw;max-height:88vh;padding:22px 18px}
+    #card::before{top:8px;left:8px;right:8px;bottom:8px}
+    #closeCard{width:40px;height:40px;line-height:40px;top:8px;right:8px;font-size:15px}
+    #card h2{font-size:18px}
+    #card .stall-tag{font-size:10px}
+    #card li{padding:14px 0}
+    #skip{font-size:11px;padding:.7em 1em}
+    #hint{font-size:10.5px;bottom:1.5%}
+  }
+  @media (prefers-reduced-motion: reduce){
+    #card{transition:none}
+  }
+  /* Present for search engines & screen readers, hidden from sighted users */
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+</head>
+<body>
+<!-- Text alternative to the canvas: indexed by search engines, read by screen readers -->
+<section class="sr-only" aria-label="About Angela Santurbano and site contents">
+  <h1>Angela Santurbano — builder PM who ships with AI</h1>
+  <p>Angela Santurbano is a product manager and builder. Ten years shipping product at Block / Square, Meta, Brex, and Cocoon; currently deep in voice AI. Based in San Francisco. She prototypes her own ideas with agentic coding tools and writes about building with AI as she goes.</p>
+  <nav aria-label="Site contents">
+    <h2>Projects</h2>
+    <ul>
+      <li><a href="https://ancora.coach">Ancora</a> — practice hard conversations out loud with an AI coach.</li>
+      <li>Fintech voice agent — a voice agent for financial services, with evaluations built in for strong compliance.</li>
+      <li>Research synthesizer — point it at any arXiv paper, give it your title and company, and it returns the top product innovation you could work on, a competitive analysis, and the engineering effort required.</li>
+    </ul>
+    <h2>Writing</h2>
+    <ul>
+      <li><a href="https://frontierbuilds.substack.com">Frontier Builds</a> — a newsletter about building with AI.</li>
+      <li><a href="https://angelasanturbano.substack.com">Personal Lessons</a> — a newsletter about learnings in product management.</li>
+      <li><a href="https://alltheangels.substack.com">All the Angels</a> — a newsletter with interviews with angel investors.</li>
+    </ul>
+    <h2>About</h2>
+    <p>Builder PM with ten years across payments and AI systems at Block / Square, Meta, Brex, and Cocoon, now focused on voice AI. Based in San Francisco.</p>
+    <h2>Reach out</h2>
+    <ul>
+      <li><a href="https://www.linkedin.com/in/angela-santurbano/" rel="me">LinkedIn</a></li>
+      <li><a href="https://x.com/angelasanturb" rel="me">X / Twitter</a></li>
+      <li><a href="https://frontierbuilds.substack.com">Subscribe to Frontier Builds</a></li>
+    </ul>
+  </nav>
+</section>
+<div id="stage">
+  <div id="frame">
+    <canvas id="scene" width="960" height="540" aria-label="A pixel-art night market. Use arrow keys to walk Franklin the Sheltie between stalls, or use the About Me button."></canvas>
+    <div id="gate">
+      <div class="brand">ANGELA'S NIGHT MARKET</div>
+      <p>wander with Franklin, resident Sheltie &nbsp;<span class="fr">· Open everyday · <span id="clock"></span> ·</span></p>
+    </div>
+    <button id="skip">ABOUT ME</button>
+    <div id="hint"><kbd>←</kbd> <kbd>→</kbd> wander &nbsp;·&nbsp; <kbd>↑</kbd> browse a stall &nbsp;·&nbsp; or just tap where you want to go</div>
+    <div id="veil"></div>
+    <section id="card" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+      <button id="closeCard" aria-label="Close">×</button>
+      <div id="cardBody"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('scene');
+  const ctx = canvas.getContext('2d');
+  const W = 960, H = 540;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============ CONTENT ============ */
+  const STALLS = [
+    {
+      id:'projects', name:'PROJECTS', cx:190, color:'#E8503A', accent:'#FFB454',
+      goods:'tools',
+      title:'The Projects Stall', sub:'made in small batches, shipped anyway',
+      html:`<ul>
+        <li><b><a href="https://ancora.coach" target="_blank" rel="noopener">Ancora</a></b>
+          <span class="note">Practice hard conversations out loud with an AI coach. Built solo, promoted in the wild.</span></li>
+        <li><b>Fintech voice agent</b>
+          <span class="note">A voice agent for financial services, with evaluations built in for strong compliance.</span></li>
+        <li><b>Research synthesizer</b>
+          <span class="note">Point it at any arXiv paper, give it your title and company description, and it pulls the top product innovation you could work on, a competitive analysis, and the engineering effort required.</span></li>
+      </ul>`
+    },
+    {
+      id:'writing', name:'WRITING', cx:480, color:'#3FA487', accent:'#FFF4DE',
+      goods:'books',
+      title:'The Writing Stall', sub:'essays, field notes, the occasional hot take',
+      html:`<ul>
+        <li><b><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Frontier Builds</a></b>
+          <span class="note">A newsletter about building with AI.</span></li>
+        <li><b><a href="https://angelasanturbano.substack.com" target="_blank" rel="noopener">Personal Lessons</a></b>
+          <span class="note">A newsletter about my learnings in product management.</span></li>
+        <li><b><a href="https://alltheangels.substack.com" target="_blank" rel="noopener">All the Angels</a></b>
+          <span class="note">A newsletter with interviews with angel investors.</span></li>
+      </ul>`
+    },
+    {
+      id:'sayhi', name:'SAY HI', cx:770, color:'#FF7BAC', accent:'#FFF4DE',
+      goods:'mail',
+      title:'The Say-Hi Stand', sub:'notes, intros, and good leads welcome',
+      html:`<ul>
+        <li><b><a href="https://www.linkedin.com/in/angela-santurbano/" target="_blank" rel="noopener">LinkedIn</a></b>
+          <span class="note">Where the work conversations happen.</span></li>
+        <li><b><a href="https://x.com/angelasanturb" target="_blank" rel="noopener">X / Twitter</a></b>
+          <span class="note">Builds-in-progress and shorter thoughts.</span></li>
+        <li><b><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Subscribe to Frontier Builds</a></b>
+          <span class="note">The best way to follow along.</span></li>
+      </ul>`
+    }
+  ];
+
+  const ABOUT = {
+    title:'About Me', sub:'pull up a chair', color:'#FFB454', name:'ABOUT ME',
+    html:`<p class="bio">Angela Santurbano is a builder PM: ten years shipping payments and AI systems at Block&#8202;/&#8202;Square, Meta, Brex, and Cocoon — and lately, deep in voice AI.</p>
+      <p class="bio">She prototypes her own ideas with agentic coding tools, writes about it as she goes, and believes the best product specs are working demos.</p>
+      <p class="bio">Based in San Francisco. Your guide tonight, Franklin, is a Sheltie of strong opinions and excellent recall.</p>`
+  };
+
+  /* ============ FRANKLIN SPRITE ============ */
+  // . transparent  B sable  D dark  W white  K near-black
+  // Blue merle Sheltie: silver-blue base (B), dark-slate merle patches (D),
+  // warm-white markings (W), near-black nose/eye (K), tan leg points (T).
+  const PAL = { B:'#8A94A2', D:'#3B434F', W:'#FFF3E0', K:'#1E2229', T:'#C0894E' };
+  const DOG_TOP = [
+    "................DD..",
+    "...............DBBD.",
+    ".WD............BBBB.",
+    "DBBD.......WWWBBKBB.",
+    "DBBBBBBBBBBWWWBWWWWK",
+    ".BBBDBBBBBBBWWWBBB..",
+    ".BBBBBBBBBBBWWW.....",
+    "..BBBBDBBBBBWW......",
+    "..BBBBBBBBBBW......."
+  ];
+  const LEGS_A = [
+    "...DD..DD..BB..BB...",
+    "...TT..TT..TT..TT...",
+    "...WW..WW..WW..WW..."
+  ];
+  const LEGS_B = [
+    "..DD....DD.BB...BB..",
+    "..TT....TT.TT...TT..",
+    "..WW....WW.WW...WW.."
+  ];
+  const PX = 3; // sprite scale
+  const DOG_W = 20 * PX, DOG_H = 12 * PX;
+
+  function drawSpriteRows(rows, x, y, flip){
+    for (let r = 0; r < rows.length; r++){
+      const row = rows[r];
+      for (let c = 0; c < row.length; c++){
+        const ch = row[c];
+        if (ch === '.') continue;
+        ctx.fillStyle = PAL[ch] || PAL.B;
+        const col = flip ? (19 - c) : c;
+        ctx.fillRect(x + col * PX, y + r * PX, PX, PX);
+      }
+    }
+  }
+  function drawFranklin(x, y, flip, step, t){
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,.35)';
+    ctx.beginPath();
+    ctx.ellipse(x + DOG_W/2, y + DOG_H + 4, 26, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    const bob = (!reduceMotion && step !== null) ? (step % 2 === 0 ? 0 : -1) : 0;
+    drawSpriteRows(DOG_TOP, x, y + bob, flip);
+    const legs = (step !== null && step % 2 === 1) ? LEGS_B : LEGS_A;
+    drawSpriteRows(legs, x, y + 9 * PX + bob, flip);
+    // idle tail wag: redraw tail tip pixel offset
+    if (!reduceMotion && step === null && Math.floor(t / 350) % 2 === 0){
+      ctx.fillStyle = PAL.W;
+      const tx = flip ? (19 - 1) : 1;
+      ctx.fillRect(x + tx * PX, y + 1 * PX, PX, PX);
+    }
+  }
+
+  /* ============ SCENE ============ */
+  const stars = [];
+  for (let i = 0; i < 70; i++){
+    stars.push({ x: Math.random() * W, y: Math.random() * 260, s: Math.random() < .2 ? 2 : 1, ph: Math.random() * Math.PI * 2 });
+  }
+
+  // Per-hour sky palette [top, mid, bottom] + `night` (0=full day, 1=dark),
+  // which drives the stars and the sun/moon crossfade. Warm-only, no blue at any
+  // hour: deep indigo at night, orange at dawn/dusk, bright gold/cream midday.
+  const SKY_HOURS = [
+    { c:['#120B26','#241243','#3A1A4E'], night:1.0  }, // 0  midnight
+    { c:['#110A22','#201040','#341745'], night:1.0  }, // 1
+    { c:['#100A20','#1C0F3A','#301642'], night:1.0  }, // 2
+    { c:['#100A20','#1C0F3A','#301642'], night:1.0  }, // 3
+    { c:['#140B22','#241040','#3E1C46'], night:1.0  }, // 4
+    { c:['#1E0F24','#40203A','#723442'], night:0.9  }, // 5  first light
+    { c:['#341E2C','#74403A','#C06440'], night:0.6  }, // 6  dawn
+    { c:['#6A4234','#B0663C','#EC9A50'], night:0.35 }, // 7  sunrise
+    { c:['#96643E','#D89252','#F6C06C'], night:0.18 }, // 8  gold morning
+    { c:['#BE8C4E','#ECBA66','#FADE92'], night:0.06 }, // 9
+    { c:['#DAAA58','#F2CE76','#FCEAAE'], night:0.01 }, // 10
+    { c:['#E8BE62','#F6DA8C','#FDF0C8'], night:0.0  }, // 11
+    { c:['#F0C86A','#F8E29E','#FEF6DA'], night:0.0  }, // 12 midday (brightest)
+    { c:['#EEC468','#F8DE98','#FDF3D2'], night:0.0  }, // 13
+    { c:['#ECC064','#F6DA90','#FCEFCC'], night:0.0  }, // 14
+    { c:['#EABA5E','#F4D68A','#FBECC4'], night:0.0  }, // 15 3 PM — bright gold/cream
+    { c:['#E0AA54','#EEC676','#F8E0A4'], night:0.03 }, // 16
+    { c:['#C88A40','#E2A454','#F2BC68'], night:0.12 }, // 17 late-afternoon gold
+    { c:['#9C5E36','#CA6E3A','#EE8E42'], night:0.34 }, // 18 golden hour
+    { c:['#6C3C36','#AA4E36','#E06A30'], night:0.58 }, // 19 sunset
+    { c:['#42283C','#70343A','#AA4430'], night:0.78 }, // 20 twilight
+    { c:['#281A36','#422642','#642E44'], night:0.9  }, // 21 dusk → night
+    { c:['#180F2A','#281838','#3C2242'], night:0.98 }, // 22
+    { c:['#140C26','#221240','#341A48'], night:1.0  }  // 23
+  ];
+  function lerpHex(h1, h2, t){
+    const a = parseInt(h1.slice(1), 16), b = parseInt(h2.slice(1), 16);
+    const r = Math.round(((a>>16)&255) + (((b>>16)&255) - ((a>>16)&255)) * t);
+    const g = Math.round(((a>>8)&255) + (((b>>8)&255) - ((a>>8)&255)) * t);
+    const bl = Math.round((a&255) + ((b&255) - (a&255)) * t);
+    return `rgb(${r},${g},${bl})`;
+  }
+  function skyNow(){
+    const d = new Date();
+    const hf = d.getHours() + d.getMinutes() / 60;   // visitor's local time
+    const i = Math.floor(hf) % 24, j = (i + 1) % 24, t = hf - Math.floor(hf);
+    const a = SKY_HOURS[i], b = SKY_HOURS[j];
+    return {
+      c: [lerpHex(a.c[0], b.c[0], t), lerpHex(a.c[1], b.c[1], t), lerpHex(a.c[2], b.c[2], t)],
+      night: a.night + (b.night - a.night) * t
+    };
+  }
+
+  function drawSky(t){
+    const sky = skyNow();
+    const g = ctx.createLinearGradient(0, 0, 0, 420);
+    g.addColorStop(0, sky.c[0]);
+    g.addColorStop(.65, sky.c[1]);
+    g.addColorStop(1, sky.c[2]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, 420);
+    // stars — only in the dark, fading with the sky
+    if (sky.night > 0.05){
+      for (const s of stars){
+        const tw = reduceMotion ? .8 : (.5 + .5 * Math.sin(t / 700 + s.ph));
+        ctx.fillStyle = `rgba(255,244,222,${(.25 + .5 * tw) * sky.night})`;
+        ctx.fillRect(s.x, s.y, s.s, s.s);
+      }
+    }
+    const mx = 858, my = 66;
+    // sun by day (crossfades with the moon at dawn/dusk)
+    if (sky.night < 0.85){
+      ctx.globalAlpha = 1 - sky.night;
+      const sg = ctx.createRadialGradient(mx, my, 4, mx, my, 48);
+      sg.addColorStop(0, '#FFE7A6'); sg.addColorStop(1, 'rgba(255,200,90,0)');
+      ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(mx, my, 48, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#FFECB4'; ctx.beginPath(); ctx.arc(mx, my, 20, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // moon by night
+    if (sky.night > 0.35){
+      ctx.globalAlpha = sky.night;
+      ctx.fillStyle = '#FFF4DE';
+      ctx.beginPath(); ctx.arc(mx, my, 22, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = sky.c[0];
+      ctx.beginPath(); ctx.arc(mx + 8, my - 6, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // skyline silhouettes
+    ctx.fillStyle = '#170E30';
+    const roofs = [[0,300,90,120],[80,320,70,100],[820,310,80,110],[890,290,70,130],[150,340,60,80],[760,335,70,85]];
+    for (const [x,y,w,h] of roofs) ctx.fillRect(x, y, w, h);
+  }
+
+  function drawLanterns(t){
+    const sway = reduceMotion ? 0 : Math.sin(t / 900) * 3;
+    ctx.strokeStyle = 'rgba(255,244,222,.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-10, 120);
+    ctx.quadraticCurveTo(W / 2, 165 + sway, W + 10, 120);
+    ctx.stroke();
+    const colors = ['#E8503A', '#FFB454', '#3FA487', '#FF7BAC'];
+    for (let i = 0; i < 9; i++){
+      const p = (i + .5) / 9;
+      const x = p * W;
+      const y = 120 + (165 + sway - 120) * (1 - Math.pow(2 * p - 1, 2)) * .95;
+      const c = colors[i % colors.length];
+      const glow = reduceMotion ? .5 : (.4 + .25 * Math.sin(t / 500 + i));
+      const grd = ctx.createRadialGradient(x, y + 12, 2, x, y + 12, 30);
+      grd.addColorStop(0, hexA(c, .55 * glow + .2));
+      grd.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(x - 30, y - 18, 60, 60);
+      ctx.fillStyle = c;
+      ctx.fillRect(x - 7, y, 14, 20);
+      ctx.fillStyle = 'rgba(255,255,255,.35)';
+      ctx.fillRect(x - 7, y + 4, 14, 3);
+      ctx.fillStyle = '#2B1B12';
+      ctx.fillRect(x - 3, y - 4, 6, 4);
+      ctx.fillRect(x - 3, y + 20, 6, 3);
+    }
+  }
+
+  function hexA(hex, a){
+    const n = parseInt(hex.slice(1), 16);
+    return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;
+  }
+
+  function drawGround(){
+    ctx.fillStyle = '#2E1B3E';
+    ctx.fillRect(0, 420, W, 120);
+    ctx.fillStyle = '#241333';
+    ctx.fillRect(0, 420, W, 8);
+    ctx.strokeStyle = 'rgba(255,244,222,.06)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 60){
+      ctx.beginPath(); ctx.moveTo(x, 428); ctx.lineTo(x - 18, 540); ctx.stroke();
+    }
+    for (let y = 450; y < 540; y += 30){
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+  }
+
+  function drawStall(s, t, near){
+    const x = s.cx, top = 210, counterY = 350, w = 170;
+    const L = x - w / 2, R = x + w / 2;
+    // glow when Franklin is near
+    if (near){
+      const grd = ctx.createRadialGradient(x, 320, 20, x, 320, 150);
+      grd.addColorStop(0, hexA(s.color, .18));
+      grd.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(L - 60, 180, w + 120, 280);
+    }
+    // posts
+    ctx.fillStyle = '#3A2418';
+    ctx.fillRect(L + 6, top + 42, 10, 190);
+    ctx.fillRect(R - 16, top + 42, 10, 190);
+    // counter
+    ctx.fillStyle = '#4A2E1E';
+    ctx.fillRect(L, counterY, w, 22);
+    ctx.fillStyle = '#3A2418';
+    ctx.fillRect(L, counterY + 22, w, 50);
+    ctx.fillStyle = 'rgba(255,244,222,.08)';
+    ctx.fillRect(L, counterY, w, 4);
+    // goods
+    drawGoods(s, L, counterY, w, t);
+    // awning (striped, scalloped)
+    const awnY = top + 26;
+    for (let i = 0; i < 8; i++){
+      ctx.fillStyle = i % 2 === 0 ? s.color : '#FFF4DE';
+      ctx.fillRect(L - 8 + i * ((w + 16) / 8), awnY, (w + 16) / 8, 26);
+    }
+    for (let i = 0; i < 8; i++){
+      ctx.fillStyle = i % 2 === 0 ? s.color : '#FFF4DE';
+      ctx.beginPath();
+      const sx = L - 8 + i * ((w + 16) / 8);
+      ctx.moveTo(sx, awnY + 26);
+      ctx.lineTo(sx + (w + 16) / 8, awnY + 26);
+      ctx.lineTo(sx + (w + 16) / 16, awnY + 38);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.fillStyle = 'rgba(0,0,0,.18)';
+    ctx.fillRect(L - 8, awnY, w + 16, 6);
+    // sign board
+    ctx.fillStyle = '#2B1B12';
+    ctx.fillRect(L + 14, top - 6, w - 28, 30);
+    ctx.fillStyle = s.color;
+    ctx.fillRect(L + 14, top - 6, w - 28, 4);
+    ctx.font = "12px 'Silkscreen', monospace";
+    ctx.textAlign = 'center';
+    ctx.fillStyle = near ? '#FFD98A' : '#FFB454';   // all signs yellow; near one a touch brighter
+    ctx.fillText(s.name, x, top + 14);
+    // side lantern
+    const sway = reduceMotion ? 0 : Math.sin(t / 800 + s.cx) * 2;
+    ctx.strokeStyle = 'rgba(255,244,222,.3)';
+    ctx.beginPath(); ctx.moveTo(R - 11, top + 42); ctx.lineTo(R - 11 + sway, top + 60); ctx.stroke();
+    ctx.fillStyle = s.accent;
+    ctx.fillRect(R - 17 + sway, top + 60, 12, 16);
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.fillRect(R - 17 + sway, top + 63, 12, 3);
+  }
+
+  function drawGoods(s, L, counterY, w, t){
+    const y = counterY - 14;
+    if (s.goods === 'tea'){
+      // teapot + cups + steam
+      ctx.fillStyle = '#7A4526';
+      ctx.fillRect(L + 40, y - 6, 26, 20);
+      ctx.fillRect(L + 66, y - 2, 8, 6);
+      ctx.fillRect(L + 50, y - 12, 6, 6);
+      ctx.fillStyle = '#FFF4DE';
+      ctx.fillRect(L + 92, y + 4, 12, 10);
+      ctx.fillRect(L + 110, y + 4, 12, 10);
+      if (!reduceMotion){
+        ctx.fillStyle = 'rgba(255,244,222,.35)';
+        const ph = Math.floor(t / 300) % 3;
+        ctx.fillRect(L + 52 + ph, y - 24, 3, 3);
+        ctx.fillRect(L + 55 - ph, y - 32, 3, 3);
+      }
+    } else if (s.goods === 'books'){
+      ctx.fillStyle = '#E8503A'; ctx.fillRect(L + 36, y + 2, 30, 6);
+      ctx.fillStyle = '#3FA487'; ctx.fillRect(L + 40, y - 4, 30, 6);
+      ctx.fillStyle = '#FFB454'; ctx.fillRect(L + 38, y - 10, 30, 6);
+      ctx.fillStyle = '#FFF4DE'; ctx.fillRect(L + 96, y - 8, 16, 22); // standing book
+      ctx.fillStyle = '#2B1B12'; ctx.fillRect(L + 100, y - 2, 8, 2);
+    } else if (s.goods === 'tools'){
+      ctx.fillStyle = '#5A6B7A'; ctx.fillRect(L + 40, y - 2, 34, 16); // toolbox
+      ctx.fillStyle = '#3A4652'; ctx.fillRect(L + 52, y - 8, 10, 6);
+      ctx.fillStyle = '#FFB454'; ctx.fillRect(L + 96, y + 6, 22, 4);  // wrench-ish
+      ctx.fillRect(L + 114, y + 2, 6, 12);
+    } else if (s.goods === 'mail'){
+      ctx.fillStyle = '#FFF4DE'; ctx.fillRect(L + 42, y + 2, 22, 14);
+      ctx.strokeStyle = '#2B1B12'; ctx.lineWidth = 2;
+      ctx.strokeRect(L + 43, y + 3, 20, 12);
+      ctx.beginPath(); ctx.moveTo(L + 43, y + 3); ctx.lineTo(L + 53, y + 11); ctx.lineTo(L + 63, y + 3); ctx.stroke();
+      ctx.fillStyle = '#FF7BAC'; ctx.fillRect(L + 92, y - 2, 18, 18);
+      ctx.fillStyle = '#FFF4DE'; ctx.fillRect(L + 97, y + 3, 8, 8);
+    }
+  }
+
+  /* ============ STATE ============ */
+  let dogX = 460, dogDir = 1, target = null, autoOpen = null;
+  const DOG_Y = 452;
+  let stepFrame = null, stepTimer = 0;
+  const SPEED = 3.2;
+  const keys = {};
+
+  function nearestStall(){
+    let best = null, bestD = 1e9;
+    for (const s of STALLS){
+      const d = Math.abs((dogX + DOG_W / 2) - s.cx);
+      if (d < bestD){ bestD = d; best = s; }
+    }
+    return bestD < 78 ? best : null;
+  }
+
+  /* ============ PANEL ============ */
+  const veil = document.getElementById('veil');
+  const card = document.getElementById('card');
+  const cardBody = document.getElementById('cardBody');
+  const closeBtn = document.getElementById('closeCard');
+  let cardOpen = false;
+
+  function openCard(s){
+    cardBody.innerHTML =
+      `<span class="stall-tag" style="background:${s.color}">${s.name}</span>
+       <h2 id="cardTitle">${s.title}</h2>
+       <div class="sub">${s.sub}</div>${s.html}`;
+    veil.classList.add('open');
+    card.classList.add('open');
+    requestAnimationFrame(() => card.classList.add('shown'));
+    cardOpen = true;
+    closeBtn.focus();
+  }
+  function closeCard(){
+    card.classList.remove('shown');
+    setTimeout(() => {
+      card.classList.remove('open');
+      veil.classList.remove('open');
+    }, reduceMotion ? 0 : 160);
+    cardOpen = false;
+    canvas.focus?.();
+  }
+  closeBtn.addEventListener('click', closeCard);
+  veil.addEventListener('click', closeCard);
+  document.getElementById('skip').addEventListener('click', () => openCard(ABOUT));
+
+  /* ============ INPUT ============ */
+  window.addEventListener('keydown', (e) => {
+    if (cardOpen){
+      if (e.key === 'Escape') closeCard();
+      return;
+    }
+    if (['ArrowLeft','ArrowRight','ArrowUp',' '].includes(e.key)) e.preventDefault();
+    keys[e.key.toLowerCase()] = true;
+    if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w' || e.key === 'Enter' || e.key === ' '){
+      const s = nearestStall();
+      if (s) openCard(s);
+    }
+  });
+  window.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (cardOpen) return;
+    const rect = canvas.getBoundingClientRect();
+    const sx = (e.clientX - rect.left) / rect.width * W;
+    // did they tap a stall?
+    let tapped = null;
+    for (const s of STALLS){
+      if (Math.abs(sx - s.cx) < 95) tapped = s;
+    }
+    target = Math.max(20, Math.min(W - DOG_W - 20, sx - DOG_W / 2));
+    autoOpen = tapped ? tapped.id : null;
+  });
+
+  /* ============ LOOP ============ */
+  function tick(t){
+    // movement
+    let moving = false;
+    if (!cardOpen){
+      if (keys['arrowleft'] || keys['a']){ dogX -= SPEED; dogDir = -1; moving = true; target = null; autoOpen = null; }
+      if (keys['arrowright'] || keys['d']){ dogX += SPEED; dogDir = 1; moving = true; target = null; autoOpen = null; }
+      if (target !== null){
+        const d = target - dogX;
+        if (Math.abs(d) > SPEED){
+          dogX += Math.sign(d) * SPEED; dogDir = Math.sign(d); moving = true;
+        } else {
+          dogX = target; target = null;
+          if (autoOpen){
+            const s = STALLS.find(s => s.id === autoOpen);
+            autoOpen = null;
+            if (s && Math.abs((dogX + DOG_W / 2) - s.cx) < 110) openCard(s);
+          }
+        }
+      }
+      dogX = Math.max(10, Math.min(W - DOG_W - 10, dogX));
+    }
+    if (moving){
+      if (t - stepTimer > 110){ stepFrame = (stepFrame === null ? 0 : stepFrame + 1); stepTimer = t; }
+    } else {
+      stepFrame = null;
+    }
+
+    // draw
+    ctx.clearRect(0, 0, W, H);
+    drawSky(t);
+    drawLanterns(t);
+    drawGround();
+    const near = nearestStall();
+    for (const s of STALLS) drawStall(s, t, near === s);
+    drawFranklin(dogX, DOG_Y, dogDir === -1, moving ? stepFrame : null, t);
+
+    // prompt bubble
+    if (near && !cardOpen){
+      const bx = dogX + DOG_W / 2;
+      ctx.fillStyle = '#FFF4DE';
+      ctx.fillRect(bx - 16, DOG_Y - 34, 32, 22);
+      ctx.beginPath();
+      ctx.moveTo(bx - 5, DOG_Y - 12); ctx.lineTo(bx + 5, DOG_Y - 12); ctx.lineTo(bx, DOG_Y - 5);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#2B1B12';
+      ctx.font = "13px 'Silkscreen', monospace";
+      ctx.textAlign = 'center';
+      ctx.fillText('↑', bx, DOG_Y - 18);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // live clock in the header — same local time that drives the sky
+  const clockEl = document.getElementById('clock');
+  function updateClock(){
+    if (clockEl) clockEl.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+  updateClock();
+  setInterval(updateClock, 15000);
+
+  let started = false;
+  function start(){ if (!started){ started = true; requestAnimationFrame(tick); } }
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(start);
+    setTimeout(start, 600); // fallback if fonts stall
+  } else {
+    start();
+  }
+})();
+</script>
+</body>
+</html>
