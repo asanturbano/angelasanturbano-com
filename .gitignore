@@ -1,2 +1,5 @@
 .DS_Store
 Thumbs.db
+
+# Private reference material (e.g. photos of Franklin) — local only, never committed
+reference/

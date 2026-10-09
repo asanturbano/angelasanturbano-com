@@ -1,49 +1,67 @@
-# Night Market — personal site build prompt
+# The Notebook — personal site build prompt
 
 ## Context
 
 You are helping me build my personal website, angelasanturbano.com. I'm Angela, a principal product manager repositioning as a "builder who ships with AI." The site is a portfolio for an active job search targeting AI-native companies, so it must impress two audiences at once: hiring managers who give it 40 seconds, and fellow builders who will poke at how it's made.
 
+This is a from-scratch redesign, developed on the `feature/notebook` branch. The previous concept (an interactive night market) is what's live on `main`; nothing on `main` changes until I approve this direction.
+
 ## The concept
 
-The site is an interactive night market, rendered like an underexposed night photograph. Visitors steer Franklin, my Shetland Sheepdog, down a market street with arrow keys (or tap-to-walk on mobile). Four stalls hold the content:
+A notebook lies open on a wooden desk, seen from straight above. Beside it stands a desk lamp. On a first visit, the notebook's cover swings open and a fountain pen writes, in relaxed modern cursive and blue-black ink, my name and then a table of contents. Below the contents, the same pen draws Franklin — my dog — in pen and ink: her outline first, then washes of diluted ink bleeding into her black markings.
 
-- **Projects** — Ancora (ancora.coach), a customer support voice agent (demo on request)
-- **Writing** — Frontier Builds newsletter (frontierbuilds.substack.com), the archive (angelasanturbano.substack.com), Angel investing ([https://alltheangels.substack.com/](https://alltheangels.substack.com/))
-- **About Me** — Product manager for 10+ years at Block, Meta, Brex, Cocoon; currently deep in voice AI; San Francisco
-- **Reach Out** — LinkedIn (linkedin.com/in/angela-santurbano), X (x.com/angelasanturb), newsletter subscribe
+The pages are vellum: translucent, so the sheets underneath show faintly through. Each contents entry opens a section; the top sheet lifts away and the section page shows through, its title written by the pen and its body printed.
 
-Walking up to a stall highlights the stall, pressing up opens a paper menu card with that stall's links or you can click on the stall directly. A three lines menu button (top right) is the permanent escape hatch: every link on one card, no strolling required. **Never remove it.**
+Visitors can make the desk their own:
 
-## Design system — do not drift from this
+- **The lamp** — dim or brighten it (pull chain, or the dimmer on its base). More light makes the vellum more see-through.
+- **Rain** — a small radio on the desk turns on the sound of rain, and the pen's nib scratches faintly as it writes. Sound is always off until the visitor turns it on.
 
-- **Grade:** underexposed night photo. Near-black backdrop, tungsten palette only (reds `#E8502E`/`#C73E2A`, oranges `#FF8C42`/`#D65A2E`, warm whites `#FFD9A0`/`#F5E9D2`). No cool or fluorescent colors. Pockets of light in darkness — stalls and lanterns are the light sources, everything else falls to shadow. Heavy vignette + animated film grain on top.
-- **Type:** Fraunces (signage, card titles), Karla (body, UI). No pixel fonts.
-- **Scale:** pedestrians are full human scale against the stalls (waist at counter height); Franklin is genuinely dog-sized.
-- **Animation rules:** all walk cycles are distance-driven (stride phase advances with ground covered — no foot-sliding). `prefers-reduced-motion` must disable ambient motion (grain shift, bokeh drift, foreground passer-by, lantern flicker) but never player-initiated movement.
-- **Cast:** the crowd is six silhouette archetypes with warm rim light (two-pass draw: warm copy offset toward the nearest light, dark body on top): tall man (long coat, pockets), stooped elderly woman (headscarf, cane, half speed), mother + child holding hands (child's shorter legs step faster), ponytail woman with swinging shopping bag, backpacker in beanie, man in cap. A large blurred figure occasionally crosses the extreme foreground.
-- **Franklin:** anatomically a blue merle Shetland sheepdog walking around in the nightmarket. Almond eyes, small ears with folded tips, white mane frill with tufted edges, tucked belly, fluffy rear pants, hocked rear legs, slim legs, low bushy tail with white tip, warm rim light on his back.
+Choices are remembered in the visitor's own browser. There is no choice screen at the door — the desk works with its defaults and the controls are part of the scene.
 
-## Current state
+## Content (the same as the live site — do not change without asking)
 
-Everything lives in one file, `night-market-v3.html`: vanilla JS + Canvas at 1600×900 internal resolution, zero dependencies beyond two Google Fonts. Read it fully before changing anything. All content is in the `STALLS` and `DIRECTORY` arrays; the crowd is in `ARCHETYPES`; Franklin is `drawFranklin()`.
+- **Projects**
+  - The Coffee Houses of San Francisco (asanturbano.github.io/coffee-houses-sf) — my favorite SF coffee shops as a five-volume clothbound guide; a 3D bookshelf. *updated aug 2026*
+  - Neko Fortune Teller (neko-fortune-teller.up.railway.app) — a grandmotherly maneki-neko reads your Four Pillars fortune; 3D, fully voiced. *updated aug 2026*
+  - Ancora (ancora.coach) — practice hard conversations out loud with an AI coach.
+  - Fintech voice agent — a voice agent for financial services with evaluations built in for compliance (no link).
+  - Research synthesizer — point it at an arXiv paper plus your title and company; get the top product innovation, a competitive analysis, and the engineering effort (no link).
+- **Writing** — Frontier Builds (frontierbuilds.substack.com), Personal Lessons (angelasanturbano.substack.com), All the Angels (alltheangels.substack.com)
+- **About** — builder PM; ten years shipping payments and AI systems at Block / Square, Meta, Brex, and Cocoon; lately deep in voice AI; prototypes her own ideas with agentic coding tools; San Francisco. Franklin is mentioned by name.
+- **Reach out** — LinkedIn (linkedin.com/in/angela-santurbano), X (x.com/angelasanturb), subscribe to Frontier Builds
+
+## Design system
+
+The full guidelines live in `design.md`. Do not drift from them. In short:
+
+- **Palette:** dark walnut desk, warm vellum, blue-black ink, a single warm lamp. No other light sources.
+- **Type:** handwriting (single-stroke script paths, animated) for short phrases only — name, contents entries, section titles, margin notes. Everything read at length is printed in EB Garamond.
+- **Motion:** one choreographed timeline, built with Motion. The pen writes like a real pen: steady speed, slower on curves, lifts between words.
+- **Franklin:** a pen-and-ink drawing with ink wash, traced from the reference photo (`reference/franklin-photo.jpg`, local only and gitignored — never commit it): mostly white coat, black ears and head markings, a dark patch on her side, running toward the viewer with her tongue out. Only the finished SVG drawing is committed.
 
 ## Engineering rules
 
-- Keep it dependency-free vanilla JS/Canvas unless a task genuinely demands more. If we outgrow one file, migrate to Astro with the canvas scene as an island — ask before restructuring.
-- Target: Cloudflare Pages, custom domain angelasanturbano.com (currently on WordPress — cutover is a roadmap item).
-- Every change must preserve: keyboard controls (arrows/WASD, Esc), tap-to-walk with auto-open, the menu button, reduced-motion support, and focus management on the dialog card.
-- Performance budget: 60fps on a mid-tier laptop, smooth on mobile Safari. Profile before and after anything touching the render loop.
+- One HTML file with vanilla JS, SVG, and CSS, plus Motion (pinned: `motion@12.4.7` from jsDelivr) and Google Fonts. Ask before adding anything else, or before migrating to a framework (Astro is the likely next step if the site outgrows one file).
+- Handwriting is precomputed: a one-off script converts each fixed phrase into SVG stroke paths, and the output is committed. No font-to-path work at runtime.
+- Hosting: GitHub Pages from the public repo `asanturbano/angelasanturbano-com`, custom domain angelasanturbano.com. Pages is not enabled yet and the domain still points to WordPress; the cutover is part of going live. The repo is public, so anything pushed — including feature branches — is publicly visible.
+- Every change must preserve:
+  - real-text equivalents for everything handwritten or drawn
+  - keyboard paths: Tab through the contents, Enter opens, Esc and the browser's Back button return to the contents
+  - a skip: any click or key during the opening finishes it instantly
+  - `prefers-reduced-motion`: the finished page appears with no writing, drawing, or cover animation. The lamp and sound still work.
+  - first-visit-only opening: return visits land on the finished contents page, with a small "watch it written" link to replay
+  - readable text at the lamp's dimmest setting (contrast at least 4.5:1)
+  - a web address per section (`#projects`, `#writing`, `#about`, `#reach-out`)
+- Performance budget: 60fps on a mid-tier laptop, smooth on mobile Safari. Audio loads only when sound is turned on.
 - Work one feature at a time. Propose the approach in 2–3 sentences before writing code. After each change, list what to manually test.
 
-## Roadmap (roughly in order)
+## Build order (each step ends with my review)
 
-1. **Mobile polish** — portrait layout, touch ergonomics, canvas perf on iOS Safari
-2. **Real content pass** — final bio copy, reorg essay URL, project screenshots/demo links inside the cards
-3. **SEO + sharing** — meta tags, OG image (a still of the market), favicon (Franklin), semantic fallback content for crawlers, page title/description
-4. **Accessibility audit** — screen-reader path through the menu, focus trap on the card, contrast check on card text, make sure no text runs over the borders
-5. **Ambience** — optional market soundscape with a mute toggle (off by default), Franklin idle animations (sniffing, sitting when idle >10s)
-6. **Depth** — subtle parallax between skyline / lantern string / stalls / street
-7. **Deploy** — repo, Cloudflare Pages, DNS cutover from WordPress, redirect any old URLs worth keeping
-8. **Later** — a fifth stall for "Now" (what I'm currently exploring), analytics (privacy-friendly, e.g. Plausible), AI-generated painted background layers if we want the final photorealism jump
-
+1. **Design brief** — this file and `design.md`.
+2. **Handwriting test** — the pen writes "Angela Santurbano" on vellum in 2–3 candidate script styles; I pick one or call it off.
+3. **The desk** — notebook opening, lamp with dimmer, the light pool, vellum translucency.
+4. **Contents page** — the full writing sequence, skip, hover underline, Franklin drawn in, reduced motion, first-visit-only replay.
+5. **Section pages** — sheet-lift transition, the four sections, per-section addresses.
+6. **Sound** — rain and pen scratch, generated in code.
+7. **Polish** — mobile, accessibility, search and sharing metadata. Then I decide whether this replaces `main`.
