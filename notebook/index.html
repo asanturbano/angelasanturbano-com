@@ -3,10 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Angela Santurbano</title>
-<meta name="description" content="Angela Santurbano is a builder PM who ships with AI. Projects, writing, and ways to reach out — in a notebook on a lamplit desk.">
+<title>Angela Santurbano — builder who ships with AI</title>
+<meta name="description" content="Angela Santurbano is a builder PM who ships with AI: ten years at Block, Meta, Brex, and Cocoon, now deep in voice AI. Her projects, writing, and ways to reach out, written into a notebook on a lamplit desk.">
+<!-- remove at go-live: this page lives on a review branch until then -->
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#241912">
+<meta name="author" content="Angela Santurbano">
+<link rel="canonical" href="https://angelasanturbano.com/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- sharing: link previews on LinkedIn, X, Slack, iMessage -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Angela Santurbano">
+<meta property="og:url" content="https://angelasanturbano.com/">
+<meta property="og:title" content="Angela Santurbano — builder who ships with AI">
+<meta property="og:description" content="Projects, writing, and ways to reach out — written in fountain pen into a notebook on a lamplit desk.">
+<meta property="og:image" content="https://angelasanturbano.com/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A notebook open on a walnut desk under a brass lamp: Angela Santurbano's name in blue-black ink, a handwritten table of contents, and a pen-and-ink sketch of Franklin the Sheltie.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@angelasanturb">
+<meta name="twitter:title" content="Angela Santurbano — builder who ships with AI">
+<meta name="twitter:description" content="Projects, writing, and ways to reach out — written in fountain pen into a notebook on a lamplit desk.">
+<meta name="twitter:image" content="https://angelasanturbano.com/og.jpg">
+
+<!-- who Angela is, for search engines -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Angela Santurbano",
+  "jobTitle": "Product Manager",
+  "description": "Builder PM who ships with AI. Ten years of product at Block/Square, Meta, Brex, and Cocoon; currently deep in voice AI.",
+  "url": "https://angelasanturbano.com",
+  "image": "https://angelasanturbano.com/og.jpg",
+  "address": { "@type": "PostalAddress", "addressLocality": "San Francisco", "addressRegion": "CA", "addressCountry": "US" },
+  "knowsAbout": ["Artificial Intelligence", "Voice AI", "Product Management", "AI agents"],
+  "sameAs": [
+    "https://www.linkedin.com/in/angela-santurbano/",
+    "https://x.com/angelasanturb",
+    "https://frontierbuilds.substack.com",
+    "https://angelasanturbano.substack.com",
+    "https://alltheangels.substack.com"
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
@@ -179,6 +222,7 @@
   #pager{position:fixed;z-index:9;left:50%;bottom:calc(16px + 2.2em);transform:translateX(-50%);
     display:flex;gap:clamp(28px, 10vw, 120px);align-items:baseline;transition:opacity .5s}
   #pager.away{opacity:0;pointer-events:none}
+  .still #pager, .still #replay, .still #radioLabel{display:none}
   #pager button{font:italic 400 clamp(15px, 1.3vw, 18px) 'EB Garamond',serif;color:rgba(255,226,190,.8);
     background:none;border:0;cursor:pointer;padding:.35em .55em;white-space:nowrap;min-width:6em}
   #pager button[hidden]{display:inline-block;visibility:hidden}
@@ -196,6 +240,14 @@
   #replay:hover{color:rgba(255,226,190,.9)}
   #replay:focus-visible{outline:2px solid #FFD9A0;outline-offset:4px}
 
+  /* without JavaScript, the content reads as a plain printed page */
+  #content{max-width:620px;margin:0 auto;padding:48px 24px 64px;background:var(--vellum);color:var(--print);line-height:1.5;font-size:18px;min-height:100vh}
+  #content h1{font-weight:500;font-size:34px}
+  #content .lede{font-style:italic;margin-bottom:28px}
+  #content h2{font-weight:500;font-size:22px;margin:28px 0 10px;letter-spacing:.04em}
+  #content ul{list-style:none} #content li{margin-bottom:.8em}
+  #content .note, #content .updated{display:block} #content .updated{font-size:.75em;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+  #content a{color:var(--ink)}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/motion@12.4.7/dist/motion.js"></script>
@@ -204,6 +256,63 @@
 <script src="ink.js"></script>
 </head>
 <body>
+<!-- The site's content, in one place. The notebook reads it from here; search engines,
+     link previews and visitors without JavaScript read it as an ordinary page. -->
+<main id="content" hidden>
+  <h1>Angela Santurbano</h1>
+  <p class="lede">Builder who ships with AI · San Francisco</p>
+  <section data-id="projects" data-title="Projects">
+    <h2>Projects</h2>
+    <ul>
+      <li><a href="https://asanturbano.github.io/coffee-houses-sf/" target="_blank" rel="noopener">The Coffee Houses of San Francisco</a>
+        <span class="note">My favorite SF coffee shops as a five-volume clothbound guide — a 3D bookshelf; pull out a volume, turn its pages.</span>
+        <span class="updated">updated aug 2026</span></li>
+      <li><a href="https://neko-fortune-teller.up.railway.app" target="_blank" rel="noopener">Neko Fortune Teller</a>
+        <span class="note">A grandmotherly maneki-neko reads your Four Pillars fortune — 3D, fully voiced, open late.</span>
+        <span class="updated">updated aug 2026</span></li>
+      <li><a href="https://ancora.coach" target="_blank" rel="noopener">Ancora</a>
+        <span class="note">Practice hard conversations out loud with an AI coach. Built solo, promoted in the wild.</span></li>
+      <li><b>Fintech voice agent</b>
+        <span class="note">A voice agent for financial services, with evaluations built in for strong compliance.</span></li>
+      <li><b>Research synthesizer</b>
+        <span class="note">Point it at an arXiv paper plus your title and company; get the top product innovation, a competitive analysis, and the engineering effort.</span></li>
+    </ul>
+  </section>
+  <section data-id="writing" data-title="Writing">
+    <h2>Writing</h2>
+    <ul>
+      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Frontier Builds</a>
+        <span class="note">A newsletter about building with AI.</span></li>
+      <li><a href="https://angelasanturbano.substack.com" target="_blank" rel="noopener">Personal Lessons</a>
+        <span class="note">A newsletter about my learnings in product management.</span></li>
+      <li><a href="https://alltheangels.substack.com" target="_blank" rel="noopener">All the Angels</a>
+        <span class="note">Interviews with angel investors.</span></li>
+    </ul>
+  </section>
+  <section data-id="about" data-title="About">
+    <h2>About</h2>
+    <p>Angela Santurbano is a builder PM: ten years shipping payments and AI systems at Block&#8202;/&#8202;Square, Meta, Brex, and Cocoon — and lately, deep in voice AI.</p>
+    <p>She prototypes her own ideas with agentic coding tools, writes about it as she goes, and believes the best product specs are working demos.</p>
+    <p>Based in San Francisco. The dog under the contents is Franklin, a Sheltie of strong opinions and excellent recall.</p>
+    <p>An earlier version of this site — a night market, with Franklin as your guide — is <a href="../night-market.html">still open</a>.</p>
+  </section>
+  <section data-id="reach-out" data-title="Reach out">
+    <h2>Reach out</h2>
+    <ul>
+      <li><a href="https://www.linkedin.com/in/angela-santurbano/" target="_blank" rel="noopener">LinkedIn</a>
+        <span class="note">Where the work conversations happen.</span></li>
+      <li><a href="https://x.com/angelasanturb" target="_blank" rel="noopener">X / Twitter</a>
+        <span class="note">Builds-in-progress and shorter thoughts.</span></li>
+      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Subscribe to Frontier Builds</a>
+        <span class="note">The best way to follow along.</span></li>
+    </ul>
+  </section>
+</main>
+<noscript><style>
+  #content{display:block !important}
+  #viewport, #pager, #replay, #lamp, #radio, #souvenir{display:none !important}
+  html, body{overflow:auto !important}
+</style></noscript>
 <div id="viewport">
   <div id="world">
     <div id="desk"></div>
@@ -873,44 +982,12 @@
      Leaf 0 is the contents; the sections lie beneath it in order. Going forward turns
      leaves right to left over the spine; going back turns them left to right. From the
      contents, the pen ticks the entry first; it writes a section's title the first time. */
-  const SECTIONS = {
-    projects:{ title:'Projects', html:`<ul>
-      <li><a href="https://asanturbano.github.io/coffee-houses-sf/" target="_blank" rel="noopener">The Coffee Houses of San Francisco</a>
-        <span class="note">My favorite SF coffee shops as a five-volume clothbound guide — a 3D bookshelf; pull out a volume, turn its pages.</span>
-        <span class="updated">updated aug 2026</span></li>
-      <li><a href="https://neko-fortune-teller.up.railway.app" target="_blank" rel="noopener">Neko Fortune Teller</a>
-        <span class="note">A grandmotherly maneki-neko reads your Four Pillars fortune — 3D, fully voiced, open late.</span>
-        <span class="updated">updated aug 2026</span></li>
-      <li><a href="https://ancora.coach" target="_blank" rel="noopener">Ancora</a>
-        <span class="note">Practice hard conversations out loud with an AI coach. Built solo, promoted in the wild.</span></li>
-      <li><b>Fintech voice agent</b>
-        <span class="note">A voice agent for financial services, with evaluations built in for strong compliance.</span></li>
-      <li><b>Research synthesizer</b>
-        <span class="note">Point it at an arXiv paper plus your title and company; get the top product innovation, a competitive analysis, and the engineering effort.</span></li>
-    </ul>` },
-    writing:{ title:'Writing', html:`<ul>
-      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Frontier Builds</a>
-        <span class="note">A newsletter about building with AI.</span></li>
-      <li><a href="https://angelasanturbano.substack.com" target="_blank" rel="noopener">Personal Lessons</a>
-        <span class="note">A newsletter about my learnings in product management.</span></li>
-      <li><a href="https://alltheangels.substack.com" target="_blank" rel="noopener">All the Angels</a>
-        <span class="note">Interviews with angel investors.</span></li>
-    </ul>` },
-    about:{ title:'About', html:`
-      <p>Angela Santurbano is a builder PM: ten years shipping payments and AI systems at Block&#8202;/&#8202;Square, Meta, Brex, and Cocoon — and lately, deep in voice AI.</p>
-      <p>She prototypes her own ideas with agentic coding tools, writes about it as she goes, and believes the best product specs are working demos.</p>
-      <p>Based in San Francisco. The dog under the contents is Franklin, a Sheltie of strong opinions and excellent recall.</p>
-      <p>An earlier version of this site — a night market, with Franklin as your guide — is <a href="../night-market.html">still open</a>.</p>` },
-    'reach-out':{ title:'Reach out', html:`<ul>
-      <li><a href="https://www.linkedin.com/in/angela-santurbano/" target="_blank" rel="noopener">LinkedIn</a>
-        <span class="note">Where the work conversations happen.</span></li>
-      <li><a href="https://x.com/angelasanturb" target="_blank" rel="noopener">X / Twitter</a>
-        <span class="note">Builds-in-progress and shorter thoughts.</span></li>
-      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Subscribe to Frontier Builds</a>
-        <span class="note">The best way to follow along.</span></li>
-    </ul>` }
-  };
-  const ORDER = ['projects', 'writing', 'about', 'reach-out'];
+  // each section's content comes from the page's own markup (#content), so there's one source
+  const SECTIONS = Object.fromEntries([...document.querySelectorAll('#content section')].map((sec) => [sec.dataset.id, {
+    title:sec.dataset.title,
+    html:[...sec.children].filter((c) => c.tagName !== 'H2').map((c) => c.outerHTML).join('')
+  }]));
+  const ORDER = Object.keys(SECTIONS);
   const book = document.getElementById('book'), contentsLeaf = document.getElementById('contentsLeaf');
   const prevBtn = document.getElementById('prevPage'), nextBtn = document.getElementById('nextPage'), pager = document.getElementById('pager');
   let leaves = [], at = 0, onFirst = false, turning = [], sectionRun = null, sectionBusy = false, ticks = {}, pending = null;
@@ -1173,8 +1250,11 @@
     };
   }
 
+  const still = new URLSearchParams(location.search).has('still');   // the finished desk, for rendering the share image
+  if (still) document.documentElement.classList.add('still');
   function start(){
     layout(); buildInk();
+    if (still){ showFinished(); return; }
     const target = pageFromHash();
     if (target > 0){ showFinished(); markSeen(); openPage(target, true); }   // a link straight to a section skips the opening
     else if (seen()) showFinished();

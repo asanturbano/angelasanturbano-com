@@ -21,6 +21,8 @@ Choices are remembered in the visitor's own browser. There is no choice screen a
 
 ## Content (the same as the live site — do not change without asking)
 
+All of it lives in one place: the `#content` markup at the top of `notebook/index.html`. The notebook builds its pages from that markup, and search engines, link previews and visitors without JavaScript read it as an ordinary page. Edit content there and nowhere else.
+
 - **Projects**
   - The Coffee Houses of San Francisco (asanturbano.github.io/coffee-houses-sf) — my favorite SF coffee shops as a five-volume clothbound guide; a 3D bookshelf. *updated aug 2026*
   - Neko Fortune Teller (neko-fortune-teller.up.railway.app) — a grandmotherly maneki-neko reads your Four Pillars fortune; 3D, fully voiced. *updated aug 2026*
