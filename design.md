@@ -6,7 +6,7 @@ A notebook open on a walnut desk under a single lamp, seen from the front of the
 
 ## Design principles
 
-1. **The page is the interface.** Navigation is the table of contents; controls are objects on the desk (the lamp, the radio, a ribbon bookmark). No floating toolbars, no hamburger, no modal dialogs.
+1. **The page is the interface.** Navigation is the table of contents, plus a quiet arrow guide below the notebook that names the pages on either side; controls are objects on the desk (the lamp, the radio). Nothing is printed on the pages to navigate them. No floating toolbars, no hamburger, no modal dialogs.
 2. **Ink is earned.** Handwriting is for short phrases only: the name, contents entries, section titles, margin notes. Anything read at length is printed. If a visitor has to decipher cursive to learn something, it's wrong.
 3. **Write at the speed of a hand.** The pen moves like a pen: steady, slower through curves, lifting between words, dotting the i's and crossing the t's after finishing the word. If it feels like a progress bar, slow it down and give it a physical reason.
 4. **One light.** The lamp is the only light source. Light falls off with distance from it; the far corner of the desk is in shadow. Interactive emphasis comes from the pen (it underlines) and from ink, never from glows, outlines, or color swaps.
@@ -21,7 +21,8 @@ A notebook open on a walnut desk under a single lamp, seen from the front of the
 - **Layout (desktop):** the open notebook sits centered. The lamp stands off the top-left corner — a right-handed writer keeps the lamp on the left so the hand doesn't shadow the page, and the pen comes in from the right. The lamp's cord runs down the left side of the desk, with the dimmer on it. The pen rests on the desk to the right of the notebook; a small radio will sit in the bottom-right corner.
 - **The spread:** the left side is the inside of the front cover, where the name is written — the way you'd write your name inside a new notebook. The first page, on the right, holds the contents.
 - **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time). The camera opens on the name page, then — once the name is written — pans across to the contents page and rests there, since the contents are the navigation. The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio will tuck into the bottom right.
-- **The ribbon bookmark:** a cloth ribbon hangs from the notebook's spine. On any section page, it is the way back to the contents (as are Esc and the browser's Back button).
+- **The pages:** the contents and each section are leaves, in order: Contents, Projects, Writing, About, Reach out. A turned leaf lies on the left, its writing showing through the vellum reversed and faint.
+- **The arrow guide:** below the notebook, in small italic print — *← Contents · Writing →* — naming the previous and next pages. The arrow keys turn pages too, Esc goes back to the contents, and the browser's Back button pages backward.
 
 ## Color
 
@@ -82,14 +83,16 @@ Any click or key during the opening finishes it instantly, and a small printed l
 
 ### Everywhere else
 
-- **Opening a section:** the pen ticks the entry; the top sheet lifts (a soft spring, about 0.5s) and slides away up and to the left, its shadow widening as it rises. The section page beneath — already faintly visible — comes into full view.
-- **Section page:** the pen writes the title (about 0.9s), then printed lines fade up one after another, about 40ms apart.
-- **Returning to the contents:** the sheet lays back down, the reverse of the lift.
+- **Turning forward:** from the contents, the pen first ticks the entry — the tick stays, marking it visited for the rest of the visit. Then the page turns right to left over the spine (about 0.85s), darkening as it rises away from the lamp; the page beneath, already faintly visible through the vellum, loses its frost. Jumping several pages riffles through them, each leaf a beat behind the last. From a contents link, keyboard focus moves to the section's heading; with the arrows, focus stays on the arrows and the new page is announced.
+- **Section page:** the content is printed (it was there all along, frosted under the contents); the pen writes the title the first time the page is opened, and it stays written after that. A list that runs past the page scrolls within it, its foot fading to say so.
+- **Addresses:** each section has its own (`#projects`, `#writing`, `#about`, `#reach-out`). A link straight to one skips the opening and lands on that page.
+- **Turning back:** the page turns back left to right — never floating in from elsewhere. Returning to the contents puts focus back on the entry you came from.
+- **On a phone:** the arrow guide includes the name page — *← First page* from the contents, *Contents →* from the name page — and the camera pans between them.
 - **Ambient motion** (barely noticeable — if a visitor can name the animation, it's too strong): a faint flicker in the lamp's filament, rain streaks in the window-light on the desk when the rain is on, the pen's slow idle sway in the margin.
 
 ### Reduced motion
 
-`prefers-reduced-motion` shows every page in its finished state: no writing, no drawing, no cover, no sheet-lift, no ambient motion. Sections switch instantly. The lamp and sound still work, because the visitor initiates them.
+`prefers-reduced-motion` shows every page in its finished state: no writing, no drawing, no cover, no page turns, no ambient motion. Sections switch instantly. The lamp and sound still work, because the visitor initiates them.
 
 ## Franklin
 
@@ -109,7 +112,7 @@ Any click or key during the opening finishes it instantly, and a small printed l
 
 ## Voice
 
-Microcopy can sound like a notebook, but never at the cost of clarity. One flourish per surface at most; entry names, link labels, and instructions are always literal ("Projects," "Back to contents," "Lamp brightness"), never coy.
+Microcopy can sound like a notebook, but never at the cost of clarity. One flourish per surface at most; entry names, link labels, and instructions are always literal ("Projects," "Contents," "Lamp brightness"), never coy.
 
 ## Quality bar (check before shipping any change)
 

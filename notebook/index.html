@@ -58,23 +58,50 @@
   #shadowClosed{left:50%;width:50%;opacity:1}
   #shadowOpen{left:0;width:100%;opacity:0}
   .page{position:absolute;top:0;width:var(--page-w);height:var(--page-h);overflow:hidden}
-  .page.right{left:var(--page-w);border-radius:2px 4px 4px 2px;
-    /* the edges of the sheets beneath */
-    box-shadow:1px 1px 0 #E2DACA, 2px 2px 0 #D8CFBD, 3px 3px 0 #CEC4B0, 4px 3px 0 #C3B8A3}
-  .under, .sheet{position:absolute;inset:0}
-  /* vellum is frosted: what lies beneath reads softly, so it never competes with fresh ink */
-  .under{background:var(--vellum);padding:9% 11%;filter:blur(1.1px)}
-  .sheet{background:
+  .sheet{position:absolute;inset:0;background:
       linear-gradient(90deg, rgba(70,48,28,.16), rgba(70,48,28,0) 7%),
       var(--fibers),
       rgba(239,233,220,var(--veil))}
-  .left .sheet{background:
+  .left .sheet, .verso .sheet{background:
       linear-gradient(270deg, rgba(70,48,28,.16), rgba(70,48,28,0) 7%),
       var(--fibers),
       var(--vellum)}
+  /* the block of pages beneath the leaves: its edges show along the fore-edge */
+  #pageBlock{position:absolute;z-index:1;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
+    border-radius:2px 4px 4px 2px;background:var(--vellum);
+    box-shadow:1px 1px 0 #E2DACA, 2px 2px 0 #D8CFBD, 3px 3px 0 #CEC4B0, 4px 3px 0 #C3B8A3}
+
+  /* ---------- leaves: the contents and each section, turned like real pages ---------- */
+  .leaf{position:absolute;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
+    transform-origin:0 50%;transform-style:preserve-3d}
+  .recto, .verso{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .recto{border-radius:2px 4px 4px 2px}
+  .verso{transform:rotateY(180deg);border-radius:4px 2px 2px 4px}
+  .leaf .content{position:absolute;inset:0}
+  /* vellum is frosted: the page beneath the open one reads softly, so it never competes */
+  .leaf.frosted .recto .content{filter:blur(1.1px)}
+  /* the back of a turned leaf: its writing shows through the vellum, reversed and faint */
+  .ghost{position:absolute;inset:0;transform:scaleX(-1);opacity:.13;filter:blur(.8px);pointer-events:none}
+  /* a turning page darkens as it rises away from the lamp */
+  .shade{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(90deg, rgba(24,14,8,.55), rgba(24,14,8,.18))}
+  .verso .shade{background:linear-gradient(270deg, rgba(24,14,8,.55), rgba(24,14,8,.18))}
   /* its own layer: Chrome otherwise rasterizes fine SVG strokes on a steeply tilted plane into a smear */
-  .ghost-title{width:46%;display:block;margin-bottom:6%;transform:translateZ(0)}
-  .ghost-lines p{font-size:calc(var(--page-w) * .032);line-height:1.5;margin-bottom:.7em;color:var(--print)}
+  .section-ink{transform:translateZ(0)}
+
+  /* ---------- a section page: a handwritten title over printed content ---------- */
+  .section-body{position:absolute;left:11%;right:10%;top:22%;bottom:7%;overflow-y:auto;overscroll-behavior:contain;
+    font-size:clamp(13px, calc(var(--page-w) * .032), 18px);line-height:1.42;color:var(--print);
+    /* when a list runs long, its foot fades: the page scrolls */
+    -webkit-mask-image:linear-gradient(#000 calc(100% - 2.2em), transparent);mask-image:linear-gradient(#000 calc(100% - 2.2em), transparent);padding-bottom:1.6em;
+    scrollbar-width:thin;scrollbar-color:rgba(27,36,51,.22) transparent}
+  .section-body ul{list-style:none}
+  .section-body li{margin-bottom:.8em}
+  .section-body .note{display:block;font-size:.93em;color:rgba(59,53,48,.88)}
+  .section-body .updated{display:block;font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:rgba(59,53,48,.6);margin-top:.15em}
+  .section-body p + p{margin-top:.65em}
+  .section-body a{color:var(--ink);font-weight:500;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
+  .section-body a:hover{text-decoration-thickness:2px}
+  .section-body a:focus-visible{outline:2px solid rgba(27,36,51,.5);outline-offset:3px;border-radius:2px}
 
   #cover{position:absolute;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
     transform-origin:0 50%;transform-style:preserve-3d;z-index:3}
@@ -101,7 +128,7 @@
   .toc a:focus-visible{outline:2px solid rgba(27,36,51,.45);outline-offset:2px}
 
   /* one pen for the whole book, in book pixels; it can rest on the desk beside it */
-  #penLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;z-index:4;pointer-events:none}
+  #penLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;z-index:60;pointer-events:none}
 
   /* ---------- light: a multiply layer (falloff) and a screen layer (warmth) ---------- */
   #light{position:absolute;inset:-60%;z-index:5;pointer-events:none;mix-blend-mode:multiply}
@@ -123,6 +150,21 @@
     background:repeating-linear-gradient(0deg,#C9A35A 0 2px,#9C7A3C 2px 4px);box-shadow:0 1px 3px rgba(0,0,0,.6)}
   #lampLevel::-moz-range-thumb{width:14px;height:22px;border:0;border-radius:3px;background:repeating-linear-gradient(0deg,#C9A35A 0 2px,#9C7A3C 2px 4px)}
   #lampLevel:focus-visible{outline:2px solid #FFD9A0;outline-offset:6px;border-radius:4px}
+
+  /* ---------- the arrow guide below the notebook ---------- */
+  #pager{position:fixed;z-index:9;left:50%;bottom:calc(16px + 2.2em);transform:translateX(-50%);
+    display:flex;gap:clamp(28px, 10vw, 120px);align-items:baseline;transition:opacity .5s}
+  #pager.away{opacity:0;pointer-events:none}
+  #pager button{font:italic 400 clamp(15px, 1.3vw, 18px) 'EB Garamond',serif;color:rgba(255,226,190,.8);
+    background:none;border:0;cursor:pointer;padding:.35em .55em;white-space:nowrap;min-width:6em}
+  #pager button[hidden]{display:inline-block;visibility:hidden}
+  #pager .arrow{font-style:normal;color:#FFD9A0;margin:0 .45em;display:inline-block;transition:transform .25s}
+  #pager #prevPage{text-align:right}
+  #pager #nextPage{text-align:left}
+  #pager #prevPage:hover .arrow{transform:translateX(-3px)}
+  #pager #nextPage:hover .arrow{transform:translateX(3px)}
+  #pager button:hover{color:#FFE9C8}
+  #pager button:focus-visible{outline:2px solid #FFD9A0;outline-offset:3px;border-radius:3px}
 
   #replay{position:fixed;z-index:9;left:50%;bottom:16px;transform:translateX(-50%);
     font:italic 400 15px 'EB Garamond',serif;color:rgba(255,226,190,.6);background:none;border:0;cursor:pointer;
@@ -146,21 +188,19 @@
     <div id="book">
       <div class="shadow" id="shadowClosed"></div>
       <div class="shadow" id="shadowOpen"></div>
-      <section class="page right">
-        <div class="under" aria-hidden="true">
-          <svg class="ghost-title" id="ghostTitle"></svg>
-          <div class="ghost-lines">
-            <p>The Coffee Houses of San Francisco</p>
-            <p>Neko Fortune Teller</p>
-            <p>Ancora</p>
-            <p>Fintech voice agent</p>
-            <p>Research synthesizer</p>
+      <div id="pageBlock"></div>
+      <!-- leaf 0: the contents; the sections' leaves are added beneath it by script -->
+      <div class="leaf" id="contentsLeaf">
+        <div class="recto">
+          <div class="sheet"></div>
+          <div class="content">
+            <svg class="inkpage" id="rightInk" aria-hidden="true"></svg>
+            <nav aria-label="Contents"><ul class="toc" id="toc"></ul></nav>
           </div>
+          <div class="shade"></div>
         </div>
-        <div class="sheet"></div>
-        <svg class="inkpage" id="rightInk" aria-hidden="true"></svg>
-        <nav aria-label="Contents"><ul class="toc" id="toc"></ul></nav>
-      </section>
+        <div class="verso" aria-hidden="true"><div class="sheet"></div><div class="ghost"></div><div class="shade"></div></div>
+      </div>
       <div id="cover">
         <div class="face front" aria-hidden="true"><div class="band"></div><div class="mono">A · S</div></div>
         <div class="face back page left">
@@ -186,6 +226,11 @@
     <button id="lampBtn" type="button" aria-label="Lamp: turn down"></button>
   </div>
 </div>
+<div class="sr-only" id="announce" aria-live="polite"></div>
+<nav id="pager" aria-label="Pages">
+  <button id="prevPage" type="button"><span class="arrow" aria-hidden="true">←</span><span class="label"></span></button>
+  <button id="nextPage" type="button"><span class="label"></span><span class="arrow" aria-hidden="true">→</span></button>
+</nav>
 <button id="replay" type="button">watch it written</button>
 
 <script>
@@ -206,14 +251,6 @@
   root.style.setProperty('--grain', noise('.003 .11', 3, [.08, .04, .02], .55, 7));
   root.style.setProperty('--fibers', noise('.9 .06', 2, [.55, .5, .42], .2, 4));
   root.style.setProperty('--cloth-tex', noise('.75', 2, [.02, .03, .05], .5, 9));
-
-  /* ---------- ink on the pages ---------- */
-  function inkSvg(svg, text, padX = 120, padY = 160){
-    const [x0, y0, x1, y1] = window.Ink.phrase(text).bbox;
-    svg.setAttribute('viewBox', `${x0 - padX} ${y0 - padY} ${x1 - x0 + padX * 2} ${y1 - y0 + padY * 2}`);
-    window.Ink.write(svg, text);
-  }
-  inkSvg(document.getElementById('ghostTitle'), 'Projects');
 
   const isPortrait = () => matchMedia('(orientation: portrait), (max-width: 760px)').matches;
   let L = 0.7;   // lamp level, 0.25..1
@@ -409,6 +446,7 @@
   }
   function setCover(open){
     cover.style.transform = `rotateY(${open ? -180 : 0}deg)`;
+    cover.style.zIndex = open ? 3 : 50;   // closed and opening, it lies over every leaf; open, the leaves turn onto it
     document.getElementById('shadowClosed').style.opacity = open ? 0 : 1;
     document.getElementById('shadowOpen').style.opacity = open ? 1 : 0;
   }
@@ -495,7 +533,7 @@
       a.href = e.href; a.textContent = `${e.text}, section ${e.num}`;
       Object.assign(a.style, { left:`${left - pw * .02}px`, top:`${y - ph * .058}px`, width:`${right - left + pw * .04}px`, height:`${ph * .075}px` });
       li.appendChild(a); toc.appendChild(li);
-      rows.push({ a, x0:left, x1:left + tW, y:y + ph * .02, s:sText, underline:null });
+      rows.push({ a, x0:left, x1:left + tW, y:y + ph * .02, base:y, s:sText, underline:null });
       a.addEventListener('pointerenter', () => underline(i, true));
       a.addEventListener('pointerleave', () => underline(i, false));
       a.addEventListener('focus', () => underline(i, true));
@@ -516,12 +554,14 @@
     penG = el('g', {}, penLayer); Ink.pen(penG);
     penScale = pw * .78 / 270;
 
-    timeline(jobs);
+    ink = timeline(jobs);
+    buildSections();
   }
 
-  function timeline(jobs){
+  // Lay out jobs (phrases to write) as pen segments: moves, lifts and strokes, in ms.
+  function timeline(jobs, from = restPos()){
     const W8 = calibrate(), segs = [], strokes = [], events = [];
-    let t = 0, pos = restPos(), first = true;
+    let t = 0, pos = from, first = true;
     for (const job of jobs){
       // a sketch fits a set time: quick hops between strokes, the rest shared by length and curvature
       const hopMs = job.fit ? Math.min(18, job.fit * .3 / job.strokes.length) : 0;
@@ -549,9 +589,10 @@
         pos = toBook(job.page, Ink.end(st));
       });
       if (job.after) events.push({ t, name:job.after });
+      if (job.wait) t += job.wait;
     }
     segs.push({ type:'move', from:pos, to:restPos(), t0:t, t1:t += 800, lift:1, toRest:true });
-    ink = { segs, strokes, events, T:t + DRY_MS, seg:0, ev:0 };
+    return { segs, strokes, events, T:t + DRY_MS, seg:0, ev:0 };
   }
 
   function frac(st, t){
@@ -571,25 +612,27 @@
     shadowG.setAttribute('opacity', (.5 - .2 * lift).toFixed(2));
   }
 
-  function render(t, instant){
-    for (const st of ink.strokes){
+  function render(t, instant, tl = ink){
+    for (const st of tl.strokes){
       if (t < st.t0){ Ink.show(st, -1); continue; }
       Ink.show(st, t >= st.t1 ? 1 : frac(st, t), t < st.t1 ? 1 : Math.max(0, 1 - (t - st.t1) / DRY_MS));
     }
-    if (t < ink.segs[ink.seg].t0) ink.seg = 0;
-    while (ink.seg < ink.segs.length - 1 && t >= ink.segs[ink.seg].t1) ink.seg++;
-    const g = ink.segs[ink.seg];
+    if (t < tl.segs[tl.seg].t0) tl.seg = 0;
+    while (tl.seg < tl.segs.length - 1 && t >= tl.segs[tl.seg].t1) tl.seg++;
+    const g = tl.segs[tl.seg];
     if (g.type === 'write') placePen(toBook(g.page, Ink.at(g.st, frac(g.st, t))), 0, 0);
     else {
       const f = Math.min(1, Math.max(0, (t - g.t0) / (g.t1 - g.t0))), e = f * f * (3 - 2 * f);
       const rest = g.fromRest ? 1 - e : g.toRest ? e : 0;
       placePen([g.from[0] + (g.to[0] - g.from[0]) * e, g.from[1] + (g.to[1] - g.from[1]) * e], Math.sin(Math.PI * f) * g.lift, rest);
     }
-    if (t < (ink.events[ink.ev - 1] || { t:-1 }).t) ink.ev = 0;
-    while (ink.ev < ink.events.length && t >= ink.events[ink.ev].t) fire(ink.events[ink.ev++].name, instant);
+    if (t < (tl.events[tl.ev - 1] || { t:-1 }).t) tl.ev = 0;
+    while (tl.ev < tl.events.length && t >= tl.events[tl.ev].t) fire(tl.events[tl.ev++].name, instant);
   }
   let panAnim = null;
   function fire(name, instant){
+    if (name === 'turn') onTurn(instant);
+    if (name === 'written' && pending && pending.id) written.add(pending.id);
     if (name === 'washes'){
       // lightest first, darkest last, each bleeding in as the one before settles
       washes.forEach((w, i) => {
@@ -606,12 +649,214 @@
     }
   }
 
+  /* ---------- pages: the contents and each section are leaves, turned like real pages ----------
+     Leaf 0 is the contents; the sections lie beneath it in order. Going forward turns
+     leaves right to left over the spine; going back turns them left to right. From the
+     contents, the pen ticks the entry first; it writes a section's title the first time. */
+  const SECTIONS = {
+    projects:{ title:'Projects', html:`<ul>
+      <li><a href="https://asanturbano.github.io/coffee-houses-sf/" target="_blank" rel="noopener">The Coffee Houses of San Francisco</a>
+        <span class="note">My favorite SF coffee shops as a five-volume clothbound guide — a 3D bookshelf; pull out a volume, turn its pages.</span>
+        <span class="updated">updated aug 2026</span></li>
+      <li><a href="https://neko-fortune-teller.up.railway.app" target="_blank" rel="noopener">Neko Fortune Teller</a>
+        <span class="note">A grandmotherly maneki-neko reads your Four Pillars fortune — 3D, fully voiced, open late.</span>
+        <span class="updated">updated aug 2026</span></li>
+      <li><a href="https://ancora.coach" target="_blank" rel="noopener">Ancora</a>
+        <span class="note">Practice hard conversations out loud with an AI coach. Built solo, promoted in the wild.</span></li>
+      <li><b>Fintech voice agent</b>
+        <span class="note">A voice agent for financial services, with evaluations built in for strong compliance.</span></li>
+      <li><b>Research synthesizer</b>
+        <span class="note">Point it at an arXiv paper plus your title and company; get the top product innovation, a competitive analysis, and the engineering effort.</span></li>
+    </ul>` },
+    writing:{ title:'Writing', html:`<ul>
+      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Frontier Builds</a>
+        <span class="note">A newsletter about building with AI.</span></li>
+      <li><a href="https://angelasanturbano.substack.com" target="_blank" rel="noopener">Personal Lessons</a>
+        <span class="note">A newsletter about my learnings in product management.</span></li>
+      <li><a href="https://alltheangels.substack.com" target="_blank" rel="noopener">All the Angels</a>
+        <span class="note">Interviews with angel investors.</span></li>
+    </ul>` },
+    about:{ title:'About', html:`
+      <p>Angela Santurbano is a builder PM: ten years shipping payments and AI systems at Block&#8202;/&#8202;Square, Meta, Brex, and Cocoon — and lately, deep in voice AI.</p>
+      <p>She prototypes her own ideas with agentic coding tools, writes about it as she goes, and believes the best product specs are working demos.</p>
+      <p>Based in San Francisco. The dog under the contents is Franklin, a Sheltie of strong opinions and excellent recall.</p>` },
+    'reach-out':{ title:'Reach out', html:`<ul>
+      <li><a href="https://www.linkedin.com/in/angela-santurbano/" target="_blank" rel="noopener">LinkedIn</a>
+        <span class="note">Where the work conversations happen.</span></li>
+      <li><a href="https://x.com/angelasanturb" target="_blank" rel="noopener">X / Twitter</a>
+        <span class="note">Builds-in-progress and shorter thoughts.</span></li>
+      <li><a href="https://frontierbuilds.substack.com" target="_blank" rel="noopener">Subscribe to Frontier Builds</a>
+        <span class="note">The best way to follow along.</span></li>
+    </ul>` }
+  };
+  const ORDER = ['projects', 'writing', 'about', 'reach-out'];
+  const book = document.getElementById('book'), contentsLeaf = document.getElementById('contentsLeaf');
+  const prevBtn = document.getElementById('prevPage'), nextBtn = document.getElementById('nextPage'), pager = document.getElementById('pager');
+  let leaves = [], at = 0, onFirst = false, turning = [], sectionRun = null, sectionBusy = false, ticks = {}, pending = null;
+  const written = new Set();
+  const leafFor = (el) => ({ el, recto:el.querySelector('.recto'), verso:el.querySelector('.verso'), shades:el.querySelectorAll('.shade'), angle:0 });
+
+  function buildSections(){
+    document.querySelectorAll('.leaf.section').forEach((l) => l.remove());
+    ticks = {};
+    leaves = [leafFor(contentsLeaf)];
+    const pw = pageW(), ph = pw * 1.3, sHead = pw * .074 / 1000 * 1.25;
+    ORDER.forEach((id) => {
+      const sec = SECTIONS[id], el = document.createElement('section');
+      el.className = 'leaf section';
+      el.setAttribute('aria-labelledby', `title-${id}`);
+      el.innerHTML = `<div class="recto"><div class="sheet"></div><div class="content">`
+        + `<svg class="inkpage section-ink" aria-hidden="true" viewBox="0 0 ${pw} ${ph}"></svg>`
+        + `<div class="section-body"><h2 class="sr-only" id="title-${id}" tabindex="-1">${sec.title}</h2>${sec.html}</div>`
+        + `</div><div class="shade"></div></div>`
+        + `<div class="verso" aria-hidden="true"><div class="sheet"></div><div class="ghost"></div><div class="shade"></div></div>`;
+      book.insertBefore(el, penLayer);
+      const leaf = leafFor(el), tP = Ink.phrase(sec.title);
+      leaf.id = id;
+      leaf.title = Ink.prepare(el.querySelector('.section-ink'), tP.strokes, { x:pw * .11 - tP.bbox[0] * sHead, y:ph * .15, s:sHead });
+      if (written.has(id)) leaf.title.strokes.forEach((st) => Ink.show(st, 1, 0));
+      leaves.push(leaf);
+    });
+    leaves.forEach((l, k) => { if (k < at) ghost(l); setAngle(l, k < at ? -180 : 0); });
+    settle();
+    updatePager();
+  }
+
+  // the back of a leaf shows its own writing, reversed, through the vellum
+  function ghost(l){
+    const g = l.verso.querySelector('.ghost'), c = l.recto.querySelector('.content').cloneNode(true);
+    c.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+    c.querySelectorAll('a, button, [tabindex]').forEach((n) => n.setAttribute('tabindex', '-1'));
+    g.replaceChildren(c);
+  }
+  function setAngle(l, a){
+    l.angle = a;
+    l.el.style.transform = `rotateY(${a}deg)`;
+    const k = Math.sin(-a * Math.PI / 180);
+    l.shades.forEach((sh) => { sh.style.opacity = (k * .45).toFixed(3); });
+  }
+  // after a turn: stack order, what's visible, what's frosted, what's reachable
+  function settle(){
+    const n = leaves.length;
+    leaves.forEach((l, k) => {
+      const left = k < at;
+      l.el.style.zIndex = left ? 10 + k : 10 + (n - k);
+      l.el.style.visibility = (left ? k === at - 1 : k <= at + 1) ? '' : 'hidden';
+      l.el.classList.toggle('frosted', !left && k === at + 1);
+      l.el.inert = left || k !== at;
+    });
+  }
+  function turnTo(target, instant){
+    turning.forEach((c) => c.stop()); turning = [];
+    at = target;
+    const moving = leaves.filter((l, k) => l.angle !== (k < target ? -180 : 0));
+    const forward = moving.filter((l) => leaves.indexOf(l) < target);
+    leaves[target].el.inert = false;
+    moving.forEach((l) => { if (forward.includes(l)) ghost(l); });
+    if (instant || !M || reduceMotion || !moving.length){
+      moving.forEach((l) => setAngle(l, forward.includes(l) ? -180 : 0));
+      settle(); return Promise.resolve();
+    }
+    // everything between stays in view while the pages are in the air
+    leaves.forEach((l) => { l.el.style.visibility = ''; l.el.classList.remove('frosted'); });
+    const seq = forward.length ? moving : moving.slice().reverse();     // forward: lowest first; back: highest first
+    seq.forEach((l, i) => {
+      const a0 = l.angle, a1 = forward.includes(l) ? -180 : 0;
+      l.el.style.zIndex = 40 + i;
+      turning.push(M.animate(0, 1, { duration:.85, delay:i * .15, ease:[.45, .05, .3, 1], onUpdate:(p) => setAngle(l, a0 + (a1 - a0) * p) }));
+    });
+    return Promise.all(turning).then(() => { turning = []; settle(); });
+  }
+
+  function makeTick(i){
+    const row = rows[i], X = (row.x0 - pageW() * .055) / row.s;
+    return Ink.prepare(rightInk, [{ pts:[X, -150, X + 70, -40, X + 260, -380] }], { x:0, y:row.base, s:row.s }).strokes[0];
+  }
+
+  // open page `target` (0 = contents): tick, turn, write the title — as one pen timeline
+  function openPage(target, instant, keepFocus = false){
+    if (playing()){ showFinished(); markSeen(); instant = true; }
+    if (sectionRun){ sectionRun.stop(); sectionRun = null; }
+    sectionBusy = false;
+    penAnim && penAnim.stop();
+    rows.forEach((r) => { if (r.underline){ r.underline.g.remove(); r.underline = null; } });
+    if (onFirst){ onFirst = false; panTo(finalX()); }
+    const from = at, id = target > 0 ? ORDER[target - 1] : null, jobs = [];
+    if (id && !ticks[id]){
+      ticks[id] = makeTick(target - 1);
+      if (from === 0) jobs.push({ page:'right', strokes:[ticks[id]], tempo:TEXT_TEMPO });   // the pen ticks it in front of you
+      else Ink.show(ticks[id], 1, 0);                                                     // otherwise it's simply marked
+    }
+    jobs.push({ page:'right', strokes:[], after:'turn' });
+    if (id && !written.has(id)) jobs.push({ page:'right', strokes:leaves[target].title.strokes, tempo:TEXT_TEMPO, pause:780, after:'written' });
+    pending = { target, from, id, keepFocus };
+    updatePager(target);
+    const tl = timeline(jobs, penPos);
+    if (instant || !M || reduceMotion){ render(tl.T, true, tl); return; }
+    sectionBusy = true;
+    sectionRun = M.animate(0, tl.T, { duration:tl.T / 1000, ease:'linear', onUpdate:(t) => render(t, false, tl),
+      onComplete:() => { sectionBusy = false; sectionRun = null; } });
+  }
+  function onTurn(instant){
+    const { target, from, keepFocus } = pending;
+    turnTo(target, instant);
+    document.getElementById('announce').textContent = target > 0 ? `${SECTIONS[ORDER[target - 1]].title} page` : 'Contents page';
+    if (keepFocus) return;   // turning with the arrows: focus stays on the arrows
+    // otherwise keyboard and screen readers land on the new page (or back on the entry they came from)
+    if (target > 0) document.getElementById(`title-${ORDER[target - 1]}`).focus({ preventScroll:true });
+    else if (from > 0 && rows[from - 1]) rows[from - 1].a.focus({ preventScroll:true });
+  }
+
+  // web addresses: #projects and friends. Arrows, keys and Esc push history, so Back pages backward.
+  const pageFromHash = () => { const k = ORDER.indexOf(decodeURIComponent(location.hash.slice(1))); return k + 1; };
+  addEventListener('hashchange', () => openPage(pageFromHash(), false));
+  function go(target){
+    if (target === 'first'){ if (at === 0){ onFirst = true; panTo(nameX()); updatePager(); } return; }
+    if (target === at && !onFirst) return;
+    history.pushState(null, '', target > 0 ? `#${ORDER[target - 1]}` : location.pathname + location.search);
+    openPage(target, false, true);
+  }
+
+  /* ---------- the arrow guide below the notebook ---------- */
+  function pages(page = at){
+    const name = (k) => k === 0 ? 'Contents' : SECTIONS[ORDER[k - 1]].title;
+    if (isPortrait() && onFirst) return { prev:null, next:{ label:'Contents', go:() => { onFirst = false; panTo(finalX()); updatePager(); } } };
+    return {
+      prev:page > 0 ? { label:name(page - 1), go:() => go(page - 1) } : isPortrait() ? { label:'First page', go:() => go('first') } : null,
+      next:page < ORDER.length ? { label:name(page + 1), go:() => go(page + 1) } : null
+    };
+  }
+  function updatePager(page = at){
+    const p = pages(page);
+    for (const [btn, side, word] of [[prevBtn, p.prev, 'Previous'], [nextBtn, p.next, 'Next']]){
+      btn.hidden = !side;
+      btn.querySelector('.label').textContent = side ? side.label : '';
+      btn.setAttribute('aria-label', side ? `${word} page: ${side.label}` : '');
+      btn.onclick = side ? side.go : null;
+    }
+  }
+  addEventListener('keydown', (e) => {
+    if (playing() || e.target === slider || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === 'ArrowRight' && !nextBtn.hidden){ e.preventDefault(); nextBtn.onclick(); }
+    if (e.key === 'ArrowLeft' && !prevBtn.hidden){ e.preventDefault(); prevBtn.onclick(); }
+    if (e.key === 'Escape' && at > 0) go(0);
+  });
+
+  // on a phone, the camera pans between the name page and the rest
+  function panTo(x){
+    panAnim && panAnim.stop();
+    if (!M || reduceMotion){ cam.x = x; cam.targetX = x; applyCamera(); return; }
+    panAnim = M.animate(cam.x, x, { duration:.9, ease:[.45, 0, .2, 1], onUpdate:(v) => { cam.x = v; cam.targetX = v; applyCamera(); } });
+  }
+
   /* ---------- playback: first visit only, skippable, replayable ---------- */
   let writing = null;
   const seen = () => { try { return localStorage.getItem('notebook.seen') === '1'; } catch (e) { return false; } };
   const markSeen = () => { try { localStorage.setItem('notebook.seen', '1'); } catch (e) {} };
   function setHint(mode){
     hint.dataset.mode = mode;
+    pager.classList.toggle('away', mode === 'skip');   // the arrows wait until the opening is done
+    if (mode !== 'skip') updatePager();
     hint.textContent = mode === 'skip' ? 'click anywhere to skip' : 'watch it written';
     if (mode === 'skip' && M && !reduceMotion){ hint.style.opacity = 0; M.animate(hint, { opacity:[0, 1] }, { duration:.8, delay:2 }); }
     else hint.style.opacity = '';
@@ -630,6 +875,8 @@
   function play(){
     if (!M || reduceMotion){ showFinished(); markSeen(); return; }
     const me = ++run;
+    if (at > 0){ history.replaceState(null, '', location.pathname + location.search); turnTo(0, true); }   // replays start from a closed book
+    onFirst = false;
     cam.targetX = nameX();
     open();
     subtitle.style.opacity = 0;
@@ -640,6 +887,7 @@
     Promise.all(opening).then(() => {
       if (me !== run) return;
       opening = [];
+      cover.style.zIndex = 3;
       writing = M.animate(0, ink.T, { duration:ink.T / 1000, delay:WRITE_DELAY, ease:'linear', onUpdate:(t) => render(t),
         onComplete:() => { writing = null; markSeen(); setHint('replay'); } });
     });
@@ -654,7 +902,7 @@
   /* ---------- hovering an entry: the pen comes over and underlines it ---------- */
   let penAnim = null;
   function underline(i, on){
-    if (playing()) return;
+    if (playing() || sectionBusy || at > 0) return;
     const row = rows[i], pw = pageW();
     penAnim && penAnim.stop();
     if (!on){
@@ -704,7 +952,13 @@
     };
   }
 
-  function start(){ layout(); buildInk(); if (seen()) showFinished(); else play(); }
+  function start(){
+    layout(); buildInk();
+    const target = pageFromHash();
+    if (target > 0){ showFinished(); markSeen(); openPage(target, true); }   // a link straight to a section skips the opening
+    else if (seen()) showFinished();
+    else play();
+  }
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
 })();
 </script>

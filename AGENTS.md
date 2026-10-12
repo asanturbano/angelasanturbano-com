@@ -47,7 +47,7 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
 - Hosting: GitHub Pages from the public repo `asanturbano/angelasanturbano-com`, custom domain angelasanturbano.com. Pages is not enabled yet and the domain still points to WordPress; the cutover is part of going live. The repo is public, so anything pushed — including feature branches — is publicly visible.
 - Every change must preserve:
   - real-text equivalents for everything handwritten or drawn
-  - keyboard paths: Tab through the contents, Enter opens, Esc and the browser's Back button return to the contents
+  - keyboard paths: Tab through the contents, Enter opens, the arrow keys turn pages, Esc returns to the contents, and the browser's Back button pages backward
   - a skip: any click or key during the opening finishes it instantly
   - `prefers-reduced-motion`: the finished page appears with no writing, drawing, or cover animation. The lamp and sound still work.
   - first-visit-only opening: return visits land on the finished contents page, with a small "watch it written" link to replay
@@ -62,6 +62,6 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
 2. **Handwriting test** — the pen writes "Angela Santurbano" on vellum in 2–3 candidate script styles; I pick one or call it off.
 3. **The desk** — notebook opening, lamp with dimmer, the light pool, vellum translucency.
 4. **Contents page** — the full writing sequence, skip, hover underline, Franklin drawn in, reduced motion, first-visit-only replay.
-5. **Section pages** — sheet-lift transition, the four sections, per-section addresses.
+5. **Section pages** — page turns forward and back, the arrow guide below the book, the four sections, per-section addresses.
 6. **Sound** — rain and pen scratch, generated in code.
 7. **Polish** — mobile, accessibility, search and sharing metadata. Then I decide whether this replaces `main`.
