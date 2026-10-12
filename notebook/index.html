@@ -91,14 +91,17 @@
   #lampBtn:focus-visible{outline:2px solid #FFD9A0;outline-offset:6px}
   #cord{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
 
-  /* ---------- a souvenir from the old site: a night market postcard, tucked under the notebook ---------- */
-  #souvenir{position:absolute;z-index:1;display:block;left:var(--card-x);top:var(--card-y);width:var(--card-w);height:calc(var(--card-w) * .64);
-    transform:rotate(-9deg);transform-origin:85% 15%;border-radius:2px;text-decoration:none;overflow:hidden;
-    background:radial-gradient(ellipse 70% 55% at 50% 28%, rgba(232,80,46,.28), rgba(232,80,46,0) 70%), linear-gradient(170deg,#21160F,#0E0907);
-    box-shadow:0 6px 16px rgba(8,4,2,.6), inset 0 0 0 1px rgba(255,217,160,.08);transition:transform .45s cubic-bezier(.3,.7,.3,1)}
-  #souvenir svg{position:absolute;inset:0;width:100%;height:100%}
+  /* ---------- a card for the old site, tucked under the notebook: plain, just the words ---------- */
+  #souvenir{position:absolute;z-index:1;display:flex;flex-direction:column;justify-content:center;gap:.35em;
+    left:var(--card-x);top:var(--card-y);width:var(--card-w);height:calc(var(--card-w) * .6);
+    padding:0 calc(var(--card-w) * .26) 0 calc(var(--card-w) * .09);box-sizing:border-box;   /* the words sit on the part that shows */
+    transform:rotate(-7deg);transform-origin:85% 15%;border-radius:2px;text-decoration:none;
+    background:linear-gradient(170deg,#F1EADB,#E4DAC6);color:var(--ink);
+    box-shadow:0 5px 14px rgba(8,4,2,.5);transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+  #souvenir .kicker{font-size:calc(var(--card-w) * .056);letter-spacing:.12em;white-space:nowrap;text-transform:uppercase;color:rgba(59,53,48,.7)}
+  #souvenir .title{font-style:italic;font-size:calc(var(--card-w) * .09);line-height:1.15}
   /* it slides a little way out from under the book when you reach for it */
-  #souvenir:hover, #souvenir:focus-visible{transform:rotate(-9deg) translate(-9%, 7%)}
+  #souvenir:hover, #souvenir:focus-visible{transform:rotate(-7deg) translate(-9%, 6%)}
   #souvenir:focus-visible{outline:2px solid #FFD9A0;outline-offset:3px}
   @media (prefers-reduced-motion: reduce){ #souvenir{transition:none} }
   /* a phone has no free desk for it: there, the About page links to the old site instead */
@@ -110,10 +113,10 @@
   #radio svg{position:absolute;overflow:visible;left:0;top:0}
   #radioBtn{position:absolute;border:0;background:transparent;cursor:pointer;pointer-events:auto;border-radius:6px}
   #radioBtn:focus-visible{outline:2px solid #FFD9A0;outline-offset:4px}
-  #radioLabel{position:absolute;white-space:nowrap;transform:translateX(-50%);font-size:13px;letter-spacing:.2em;
+  #radioLabel{position:absolute;width:max-content;white-space:normal;transform:translateX(-50%);font-size:13px;letter-spacing:.2em;
     text-transform:uppercase;color:rgba(255,226,190,.62);pointer-events:none;text-align:center}
   /* while it plays, the radio credits the recording (Musopen asks for in-line attribution) */
-  #radioLabel .credit{display:block;margin-top:.35em;font-style:italic;font-size:12px;letter-spacing:.02em;text-transform:none;color:rgba(255,226,190,.5)}
+  #radioLabel .credit{display:block;margin-top:.35em;white-space:nowrap;font-style:italic;font-size:12px;letter-spacing:.02em;text-transform:none;color:rgba(255,226,190,.68)}
 
   /* ---------- the notebook ---------- */
   #book{position:absolute;z-index:2;
@@ -137,6 +140,9 @@
   #pageBlock{position:absolute;z-index:1;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
     border-radius:2px 4px 4px 2px;background:var(--vellum);
     box-shadow:1px 1px 0 #E2DACA, 2px 2px 0 #D8CFBD, 3px 3px 0 #CEC4B0, 4px 3px 0 #C3B8A3}
+
+  .edge{position:absolute;left:calc(var(--page-w) * 2);width:0;height:0;pointer-events:none}
+  #edgeTop{top:0} #edgeBottom{top:var(--page-h)}
 
   /* ---------- leaves: the contents and each section, turned like real pages ---------- */
   .leaf{position:absolute;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
@@ -164,7 +170,7 @@
   .section-body ul{list-style:none}
   .section-body li{margin-bottom:.8em}
   .section-body .note{display:block;font-size:.93em;color:rgba(59,53,48,.88)}
-  .section-body .updated{display:block;font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:rgba(59,53,48,.6);margin-top:.15em}
+  .section-body .updated{display:block;font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:rgba(59,53,48,.8);margin-top:.15em}
   .section-body p + p{margin-top:.65em}
   .section-body a{color:var(--ink);font-weight:500;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em}
   .section-body a:hover{text-decoration-thickness:2px}
@@ -246,7 +252,7 @@
   #content .lede{font-style:italic;margin-bottom:28px}
   #content h2{font-weight:500;font-size:22px;margin:28px 0 10px;letter-spacing:.04em}
   #content ul{list-style:none} #content li{margin-bottom:.8em}
-  #content .note, #content .updated{display:block} #content .updated{font-size:.75em;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+  #content .note, #content .updated{display:block} #content .updated{font-size:.75em;letter-spacing:.12em;text-transform:uppercase;opacity:.8}
   #content a{color:var(--ink)}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
@@ -264,6 +270,9 @@
   <section data-id="projects" data-title="Projects">
     <h2>Projects</h2>
     <ul>
+      <li><a href="https://solids-weld.vercel.app/" target="_blank" rel="noopener">Solids app</a>
+        <span class="note">An app to help parents navigate introducing solids to your baby, starting at 6 months.</span>
+        <span class="updated">updated oct 2026</span></li>
       <li><a href="https://asanturbano.github.io/coffee-houses-sf/" target="_blank" rel="noopener">The Coffee Houses of San Francisco</a>
         <span class="note">My favorite SF coffee shops as a five-volume clothbound guide — a 3D bookshelf; pull out a volume, turn its pages.</span>
         <span class="updated">updated aug 2026</span></li>
@@ -313,31 +322,21 @@
   #viewport, #pager, #replay, #lamp, #radio, #souvenir{display:none !important}
   html, body{overflow:auto !important}
 </style></noscript>
-<div id="viewport">
+<div id="viewport" role="main" aria-label="Angela Santurbano's notebook">
   <div id="world">
     <div id="desk"></div>
     <svg id="cord" aria-hidden="true"><path fill="none" stroke="#120C08" stroke-width="5" stroke-linecap="round"/></svg>
 
-    <a id="souvenir" href="../night-market.html" aria-label="A postcard from the previous version of this site, Angela's Night Market">
-      <svg viewBox="0 0 320 205" aria-hidden="true">
-        <path d="M-10 44 Q 160 86 330 40" fill="none" stroke="rgba(255,217,160,.35)" stroke-width="1.4"/>
-        <g>
-          <circle cx="34" cy="55" r="9" fill="#E8502E"/><circle cx="34" cy="55" r="20" fill="rgba(255,140,66,.18)"/>
-          <circle cx="98" cy="67" r="9" fill="#FF8C42"/><circle cx="98" cy="67" r="20" fill="rgba(255,140,66,.18)"/>
-          <circle cx="162" cy="71" r="9" fill="#C73E2A"/><circle cx="162" cy="71" r="20" fill="rgba(255,140,66,.18)"/>
-          <circle cx="226" cy="66" r="9" fill="#E8502E"/><circle cx="226" cy="66" r="20" fill="rgba(255,140,66,.18)"/>
-          <circle cx="290" cy="54" r="9" fill="#FF8C42"/><circle cx="290" cy="54" r="20" fill="rgba(255,140,66,.18)"/>
-        </g>
-        <!-- lettered on the left, the part that peeks out from under the notebook -->
-        <text x="20" y="122" fill="rgba(255,217,160,.7)" font-family="EB Garamond, serif" font-size="17" letter-spacing="4">ANGELA'S</text>
-        <text x="20" y="152" fill="#FFD9A0" font-family="EB Garamond, serif" font-size="29" letter-spacing="4">NIGHT MARKET</text>
-        <text x="20" y="182" fill="rgba(255,217,160,.62)" font-family="EB Garamond, serif" font-style="italic" font-size="18">the old site →</text>
-      </svg>
+    <a id="souvenir" href="../night-market.html">
+      <span class="kicker">the old website</span>
+      <span class="title">Night market with Franklin →</span>
     </a>
     <div id="book">
       <div class="shadow" id="shadowClosed"></div>
       <div class="shadow" id="shadowOpen"></div>
       <div id="pageBlock"></div>
+      <!-- invisible markers at the fore-edge's corners: where the notebook's right edge falls on screen -->
+      <i class="edge" id="edgeTop" aria-hidden="true"></i><i class="edge" id="edgeBottom" aria-hidden="true"></i>
       <!-- leaf 0: the contents; the sections' leaves are added beneath it by script -->
       <div class="leaf" id="contentsLeaf">
         <div class="recto">
@@ -433,7 +432,7 @@
     // always about half a page wide, so it keeps its proportion to the notebook at any window size.
     // Wide: just past the fore-edge, further back where the tilt draws it inward. Portrait: standing
     // just behind the top corner of the page in view (screen position, so subtract the camera's shift).
-    const radio = portrait ? { x:W / 2 + pwNow / 2 - shift, y:H / 2 - phNow / 2 - RADIO.d * ru * 1.2 } : { x:W / 2 + pwNow + 34 + RADIO.w * ru, y:H * .46 };
+    const radio = portrait ? { x:W / 2 + pwNow / 2 - shift, y:H / 2 - phNow / 2 - RADIO.d * ru * 1.2 } : { x:W / 2 + pwNow + 34 + RADIO.w * ru, y:H * .3 };
     root.style.setProperty('--radio-x', `${radio.x}px`); root.style.setProperty('--radio-y', `${radio.y}px`);
 
     const u = pageW() / 400;                       // lamp proportions follow the notebook
@@ -616,7 +615,14 @@
     // the label sits on the desk at its left foot, where the frame won't crop it
     // wide: on the desk at its foot; portrait: beside it, since its foot meets the top of the page
     if (isPortrait()) Object.assign(radioLabel.style, { left:`${-w * 1.08}px`, top:`${P(0, -d, h)[1] + h * sn * .5}px`, transform:'translateX(-100%)', textAlign:'right' });
-    else Object.assign(radioLabel.style, { left:`${-w * .55}px`, top:`${gy + 14 * u}px`, transform:'translateX(-50%)', textAlign:'center' });
+    else {
+      // on the open desk above the notebook, right-aligned against the radio: wide and clear of the page
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      const bookTop = document.getElementById('edgeTop').getBoundingClientRect().top;
+      const right = cx - w * k - 12, top = Math.max(8, bookTop - 48);
+      Object.assign(radioLabel.style, { left:`${(right - cx) / k}px`, top:`${(top - cy) / k}px`, transform:'translateX(-100%)', textAlign:'right',
+        maxWidth:`${Math.max(140, (right - 24) / k)}px` });
+    }
   }
 
   /* ---------- sound: music on the radio, and the pen's nib — never autoplayed ----------
