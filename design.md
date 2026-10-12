@@ -20,7 +20,7 @@ A notebook open on a walnut desk under a single lamp, seen from the front of the
 - **The lamp:** a brass architect's lamp — a beveled, weighted base behind and left of the notebook, a jointed arm, and a conical enamel shade (blue-black, like the ink) angled down toward the page, with lamplight catching the lip of its rim. A cone, not a dome: seen from above, a dome reads as a ball.
 - **Layout (desktop):** the open notebook sits centered. The lamp stands off the top-left corner — a right-handed writer keeps the lamp on the left so the hand doesn't shadow the page, and the pen comes in from the right. The lamp's cord runs down the left side of the desk, with the dimmer on it. The pen rests on the desk to the right of the notebook; a small radio will sit in the bottom-right corner.
 - **The spread:** the left side is the inside of the front cover, where the name is written — the way you'd write your name inside a new notebook. The first page, on the right, holds the contents.
-- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time, starting with the name). The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio will tuck into the bottom right.
+- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time). The camera opens on the name page, then — once the name is written — pans across to the contents page and rests there, since the contents are the navigation. The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio will tuck into the bottom right.
 - **The ribbon bookmark:** a cloth ribbon hangs from the notebook's spine. On any section page, it is the way back to the contents (as are Esc and the browser's Back button).
 
 ## Color
@@ -74,11 +74,11 @@ Motion is the experience here, so it is choreographed as one timeline (built wit
 | 0.4–1.4s | The cover swings open; the camera pulls back to show the lamp's pool. |
 | 1.5–9.0s | The pen slowly writes "Angela Santurbano," then a short underline flourish. |
 | 9.0s | The printed subtitle fades in: *builder who ships with AI · San Francisco*. |
-| 9.3–11.7s | The pen writes, at the quicker tempo, "Contents" and the four entries, each with a dotted leader and a Roman numeral. Each entry becomes clickable as soon as it's written. |
+| 9.3–11.7s | The pen writes, at the quicker tempo, "Contents" and the four entries, each with a dotted leader (the pen taps out each dot) and a lowercase roman numeral, i–iv — a cursive capital I reads as a J. Each entry becomes clickable as soon as it's written. |
 | 11.7–13.5s | The pen draws Franklin below the contents; ink washes bleed into her markings. |
 | 13.5s | The pen comes to rest in the margin. |
 
-Any click or key during the opening finishes it instantly. Return visits land on the finished page; a small printed "watch it written" link replays the opening.
+Any click or key during the opening finishes it instantly, and a small printed line at the foot of the desk — *click anywhere to skip* — fades in two seconds into the opening so first-time visitors know. Return visits land on the finished page; the same line then reads "watch it written" and replays the opening.
 
 ### Everywhere else
 

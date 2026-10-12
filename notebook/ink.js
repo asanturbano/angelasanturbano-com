@@ -35,6 +35,74 @@
     return p;
   }
 
+  // Time table for one stroke: slower through curves and at touch-down and lift-off.
+  // `weight` is the stroke's duration in arbitrary units; the choreographer scales it.
+  function timing(p){
+    const n = p.length / 2, len = [0], w = [0];
+    for (let i = 1; i < n; i++){
+      const dx = p[2 * i] - p[2 * i - 2], dy = p[2 * i + 1] - p[2 * i - 1];
+      let turn = 0;
+      if (i > 1){
+        const a0 = Math.atan2(p[2 * i - 1] - p[2 * i - 3], p[2 * i - 2] - p[2 * i - 4]), a1 = Math.atan2(dy, dx);
+        turn = Math.abs(Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0)));
+      }
+      const ds = Math.hypot(dx, dy);
+      len.push(len[i - 1] + ds);
+      w.push(ds + turn * 70);
+    }
+    const total = len[n - 1] || 1;
+    let acc = 0; const time = [0];
+    for (let i = 1; i < n; i++){
+      const f = len[i] / total;
+      acc += w[i] * ((f < .08 || f > .92) ? 1.7 : 1);
+      time.push(acc);
+    }
+    return { len, time, total, weight:acc || 1 };
+  }
+
+  // Animatable ink: each stroke starts hidden; show() reveals a fraction of it.
+  // Strokes are in font units, placed at (x, y) in the parent's coordinates at s px per unit.
+  function prepare(parent, strokes, { x = 0, y = 0, s = 1 } = {}){
+    const ox = Math.cos(NIB.angle) * NIB.width / 2, oy = Math.sin(NIB.angle) * NIB.width / 2;
+    const g = el('g', { transform:`translate(${x} ${y}) scale(${s})`, fill:'none',
+      'stroke-linecap':'round', 'stroke-linejoin':'round', 'stroke-width':NIB.hairline }, parent);
+    const out = strokes.map((st) => {
+      const d = smoothPath(st.pts), sg = el('g', { opacity:0, color:INK_DRY }, g);
+      el('circle', { cx:st.pts[0], cy:st.pts[1], r:NIB.width * .42, fill:'currentColor', stroke:'none' }, sg);   // ink pools where the nib lands
+      const copies = [];
+      for (let k = 0; k < NIB.copies; k++){
+        const u = k / (NIB.copies - 1) * 2 - 1;
+        copies.push(el('path', { d, pathLength:1, 'stroke-dasharray':'1 1', 'stroke-dashoffset':1, stroke:'currentColor',
+          transform:`translate(${(u * ox).toFixed(1)} ${(u * oy).toFixed(1)})` }, sg));
+      }
+      return { g:sg, copies, ref:copies[NIB.copies >> 1], refLen:0, pts:st.pts, word:st.word || 0,
+        late:!!st.late, tm:timing(st.pts), x, y, s, shown:-1 };
+    });
+    return { g, strokes:out };
+  }
+
+  // Where the nib is when `frac` of the stroke is drawn, in the parent's coordinates.
+  function at(st, frac){
+    if (!st.refLen) st.refLen = st.ref.getTotalLength();
+    const p = st.ref.getPointAtLength(frac * st.refLen);
+    return [st.x + p.x * st.s, st.y + p.y * st.s];
+  }
+  function start(st){ return [st.x + st.pts[0] * st.s, st.y + st.pts[1] * st.s]; }
+  function end(st){ const n = st.pts.length; return [st.x + st.pts[n - 2] * st.s, st.y + st.pts[n - 1] * st.s]; }
+
+  // Reveal a stroke: frac < 0 hides it; `wet` (0..1) blends from dry to freshly wet ink.
+  const DRY = [27, 36, 51], WET = [34, 48, 74];
+  function show(st, frac, wet = 0){
+    const key = frac < 0 ? -1 : `${Math.round(frac * 2000)}|${wet.toFixed(2)}`;
+    if (key === st.shown) return;
+    st.shown = key;
+    if (frac < 0){ st.g.setAttribute('opacity', 0); return; }
+    st.g.setAttribute('opacity', 1);
+    const off = (1 - frac).toFixed(4);
+    for (const c of st.copies) c.setAttribute('stroke-dashoffset', off);
+    st.g.setAttribute('color', `rgb(${DRY.map((v, i) => Math.round(v + (WET[i] - v) * wet)).join(',')})`);
+  }
+
   // Draw a phrase as finished, dry ink. Returns the <g> holding one group per stroke.
   function write(parent, text, { x = 0, y = 0, scale = 1 } = {}){
     const p = phrase(text);
@@ -73,5 +141,5 @@
     return g;
   }
 
-  window.Ink = { NIB, INK_DRY, INK_WET, el, smoothPath, phrase, write, pen };
+  window.Ink = { NIB, INK_DRY, INK_WET, el, smoothPath, phrase, timing, prepare, at, start, end, show, write, pen };
 })();

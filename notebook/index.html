@@ -15,19 +15,20 @@
     --vellum:#EFE9DC; --ink:#1B2433; --print:#3B3530;
     --cloth:#1E2532; --brass:#B8934E;
     /* a page is A5-ish; on a wide screen the spread fits side by side */
-    --page-w:min(32vw, 47vh);
-    --page-h:calc(var(--page-w) * 1.4);
+    --page-w:min(37vw, 58vh);
+    --page-h:calc(var(--page-w) * 1.3);   /* a little squarer than A5, so the book fills the frame */
     --veil:.88;            /* vellum opacity: set by the lamp — more light, more show-through */
   }
   @media (orientation: portrait), (max-width: 760px){
     :root{ --page-w:min(84vw, 62vh); }
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{height:100%;overflow:hidden;background:#140D09}
+  html,body{height:100%;overflow:hidden;overflow:clip;background:#140D09}
   body{font-family:'EB Garamond',serif;color:var(--print)}
 
   /* the camera sits at the front of the desk, looking down at an angle */
-  #viewport{position:fixed;inset:0;overflow:hidden;perspective:1500px;perspective-origin:50% 45%}
+  /* clip, not hidden: hidden still lets focus() and scrollIntoView() slide the whole desk sideways */
+  #viewport{position:fixed;inset:0;overflow:hidden;overflow:clip;perspective:1500px;perspective-origin:50% 45%}
   #world{position:absolute;inset:0;transform-origin:50% 50%}
 
   /* ---------- the desk: walnut, long grain ---------- */
@@ -61,7 +62,8 @@
     /* the edges of the sheets beneath */
     box-shadow:1px 1px 0 #E2DACA, 2px 2px 0 #D8CFBD, 3px 3px 0 #CEC4B0, 4px 3px 0 #C3B8A3}
   .under, .sheet{position:absolute;inset:0}
-  .under{background:var(--vellum);padding:9% 11%}
+  /* vellum is frosted: what lies beneath reads softly, so it never competes with fresh ink */
+  .under{background:var(--vellum);padding:9% 11%;filter:blur(1.1px)}
   .sheet{background:
       linear-gradient(90deg, rgba(70,48,28,.16), rgba(70,48,28,0) 7%),
       var(--fibers),
@@ -89,12 +91,17 @@
     text-shadow:0 1px 0 rgba(255,255,255,.06)}
   .back{transform:rotateY(180deg)}
   .back .sheet{border-radius:4px 2px 2px 4px}
-  .back .content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9%}
-  #name{width:100%;height:auto;overflow:visible}
-  .subtitle{margin-top:6%;text-align:center;font-style:italic;font-size:calc(var(--page-w) * .038);color:var(--print);letter-spacing:.01em}
+  /* handwriting lives in one full-page SVG per page, in page pixels */
+  .inkpage{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .subtitle{position:absolute;left:0;right:0;text-align:center;font-style:italic;font-size:calc(var(--page-w) * .038);color:var(--print);letter-spacing:.01em}
 
-  #restingPen{position:absolute;z-index:3;overflow:visible;pointer-events:none;
-    left:var(--pen-x);top:var(--pen-y);width:1px;height:1px}
+  /* the contents are real links laid over the handwriting */
+  .toc{position:absolute;inset:0;list-style:none}
+  .toc a{position:absolute;display:block;border-radius:3px;color:transparent;text-decoration:none;font-size:1px;cursor:pointer}
+  .toc a:focus-visible{outline:2px solid rgba(27,36,51,.45);outline-offset:2px}
+
+  /* one pen for the whole book, in book pixels; it can rest on the desk beside it */
+  #penLayer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;z-index:4;pointer-events:none}
 
   /* ---------- light: a multiply layer (falloff) and a screen layer (warmth) ---------- */
   #light{position:absolute;inset:-60%;z-index:5;pointer-events:none;mix-blend-mode:multiply}
@@ -103,6 +110,10 @@
   /* ---------- the dimmer, inline on the lamp cord ---------- */
   #dimmer{position:absolute;z-index:7;left:var(--dim-x);top:var(--dim-y);transform:translate(-50%,-50%);
     display:flex;flex-direction:column;align-items:center;gap:6px}
+  /* on wide screens the dimmer runs upright along the cord, in the margin beside the book */
+  @media (orientation: landscape) and (min-width: 761px){
+    #dimmer{transform:translate(-50%,-50%) rotate(-90deg)}
+  }
   #dimmer label{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,226,190,.62)}
   .switch{background:linear-gradient(#2A221C,#16110D);border-radius:14px;padding:7px 12px;box-shadow:0 3px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07)}
   #lampLevel{-webkit-appearance:none;appearance:none;width:112px;height:22px;background:transparent;cursor:pointer;display:block}
@@ -134,7 +145,7 @@
     <div id="book">
       <div class="shadow" id="shadowClosed"></div>
       <div class="shadow" id="shadowOpen"></div>
-      <section class="page right" aria-label="Contents">
+      <section class="page right">
         <div class="under" aria-hidden="true">
           <svg class="ghost-title" id="ghostTitle"></svg>
           <div class="ghost-lines">
@@ -146,21 +157,21 @@
           </div>
         </div>
         <div class="sheet"></div>
+        <svg class="inkpage" id="rightInk" aria-hidden="true"></svg>
+        <nav aria-label="Contents"><ul class="toc" id="toc"></ul></nav>
       </section>
       <div id="cover">
         <div class="face front" aria-hidden="true"><div class="band"></div><div class="mono">A · S</div></div>
         <div class="face back page left">
           <div class="sheet"></div>
-          <div class="content">
-            <h1 class="sr-only">Angela Santurbano</h1>
-            <svg id="name" aria-hidden="true"></svg>
-            <p class="subtitle">builder who ships with AI · San Francisco</p>
-          </div>
+          <h1 class="sr-only">Angela Santurbano</h1>
+          <svg class="inkpage" id="leftInk" aria-hidden="true"></svg>
+          <p class="subtitle" id="subtitle">builder who ships with AI · San Francisco</p>
         </div>
       </div>
+      <svg id="penLayer" aria-hidden="true"></svg>
     </div>
 
-    <svg id="restingPen" aria-hidden="true"></svg>
     <div id="lampAnchor"></div>
     <div id="light"></div>
     <div id="glow"></div>
@@ -174,7 +185,7 @@
     <button id="lampBtn" type="button" aria-label="Lamp: turn down"></button>
   </div>
 </div>
-<button id="replay" type="button">watch it open</button>
+<button id="replay" type="button">watch it written</button>
 
 <script>
 (() => {
@@ -201,7 +212,6 @@
     svg.setAttribute('viewBox', `${x0 - padX} ${y0 - padY} ${x1 - x0 + padX * 2} ${y1 - y0 + padY * 2}`);
     window.Ink.write(svg, text);
   }
-  inkSvg(document.getElementById('name'), 'Angela Santurbano');
   inkSvg(document.getElementById('ghostTitle'), 'Projects');
 
   const isPortrait = () => matchMedia('(orientation: portrait), (max-width: 760px)').matches;
@@ -213,31 +223,19 @@
     const portrait = isPortrait();
     // Placed by where they should land on screen once the book is open; the world is
     // shifted on phones (to center the left page), so subtract that shift.
-    const shift = openTargetX();
+    const shift = finalX();
     const lamp = portrait ? { x:W * .24 - shift, y:H * .22 } : { x:W * .19, y:H * .42 };   // the pool, under the shade
-    const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:H * .86 } : { x:Math.max(135, W * .14), y:H * .87 };   // below the book's near corner (the tilt spreads the near edge outward)
-    const penAt = portrait ? { x:W * .74 - shift, y:H * .84 } : { x:W / 2 + pageW() * 1.12, y:H * .58 };
+    const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:H * .86 } : { x:Math.max(46, W * .05), y:H * .6 };    // in the left margin, along the cord (turned upright by CSS)
     root.style.setProperty('--lamp-x', `${lamp.x}px`); root.style.setProperty('--lamp-y', `${lamp.y}px`);
-    root.style.setProperty('--pen-x', `${penAt.x}px`); root.style.setProperty('--pen-y', `${penAt.y}px`);
     root.style.setProperty('--dim-x', `${dim.x}px`); root.style.setProperty('--dim-y', `${dim.y}px`);
 
-    const u = pageW() / 360;                       // lamp proportions follow the notebook
+    const u = pageW() / 400;                       // lamp proportions follow the notebook
     const base = { x:-165 * u, y:-125 * u };       // the base sits behind and left of the pool
     state.u = u; state.base = base;
 
     // the cord: from the lamp base, through the dimmer, off the desk
     const p = `M${lamp.x + base.x} ${lamp.y + base.y} C ${lamp.x + base.x - 40} ${lamp.y + H * .2}, ${dim.x + 60} ${dim.y - H * .22}, ${dim.x} ${dim.y} S ${dim.x - 30} ${H + 40}, ${dim.x - 80} ${H + 80}`;
     document.querySelector('#cord path').setAttribute('d', p);
-
-    // resting pen, lit from the lamp: its shadow falls away from it
-    const pen = document.getElementById('restingPen');
-    pen.innerHTML = '';
-    const em = parseFloat(getComputedStyle(document.querySelector('.page')).width) * .82 / 8.7;
-    const s = em / 74;
-    const sh = el('g', { transform:`translate(${8 * s} ${12 * s}) rotate(-62) scale(${s})`, filter:'url(#penBlur)', opacity:.55 }, pen);
-    el('feGaussianBlur', { stdDeviation:3 }, el('filter', { id:'penBlur', x:'-20%', y:'-50%', width:'140%', height:'200%' }, el('defs', {}, pen)));
-    window.Ink.pen(sh, '#0E0805');
-    window.Ink.pen(el('g', { transform:`rotate(-62) scale(${s})` }, pen));
 
     // the book's shadow falls away from the lamp
     const vx = (W / 2) - lamp.x, vy = (H / 2) - lamp.y, n = Math.hypot(vx, vy);
@@ -364,7 +362,7 @@
     light.style.background = `radial-gradient(circle at ${ox}px ${oy}px, ${css})`;
     const r1 = (.22 + .3 * L) * vmax;
     glow.style.background = `radial-gradient(circle at ${ox}px ${oy}px, rgba(255,196,128,${(.3 * L).toFixed(3)}) 0, rgba(255,170,96,${(.1 * L).toFixed(3)}) ${Math.round(r1 * .7)}px, rgba(255,170,96,0) ${Math.round(r1 * 1.5)}px)`;
-    root.style.setProperty('--veil', (.93 - .08 * L).toFixed(3));
+    root.style.setProperty('--veil', (.95 - .07 * L).toFixed(3));
     slider.value = Math.round(L * 100);
     slider.setAttribute('aria-valuetext', `${Math.round(L * 100)} percent`);
     lampBtn.setAttribute('aria-label', L > .3 ? 'Lamp: turn down' : 'Lamp: turn up');
@@ -391,14 +389,18 @@
   const tiltParam = parseFloat(new URLSearchParams(location.search).get('tilt'));
   const TILT = () => !isNaN(tiltParam) ? tiltParam : (isPortrait() ? 22 : 32);
   const cam = { x:0, scale:1, tilt:0 };
-  function openTargetX(){ return isPortrait() ? pageW() / 2 : 0; }
+  // On a phone only one page fits: the camera opens on the name page, then pans to the
+  // contents page and rests there (it's the navigation). Wide screens see both pages.
+  const nameX = () => isPortrait() ? pageW() / 2 : 0;
+  const finalX = () => isPortrait() ? -pageW() / 2 : 0;
+  cam.targetX = null;   // where the camera pulls back to; null means its resting view
   function applyCamera(){
     world.style.transform = `translateX(${cam.x}px) scale(${cam.scale}) rotateX(${cam.tilt}deg)`;
     drawLamp();
   }
   function setCamera(p){
     // p: 0 = close and straight overhead on the closed cover, 1 = pulled back, tilted
-    const x0 = -CLOSE_SCALE * pageW() / 2, x1 = openTargetX();
+    const x0 = -CLOSE_SCALE * pageW() / 2, x1 = cam.targetX ?? finalX();
     cam.x = x0 + (x1 - x0) * p;
     cam.scale = CLOSE_SCALE + (1 - CLOSE_SCALE) * p;
     cam.tilt = TILT() * p;
@@ -420,19 +422,248 @@
       M.animate('#shadowClosed', { opacity:[1, 0] }, { duration:.5, delay:.75 }),
       M.animate('#shadowOpen', { opacity:[0, 1] }, { duration:.6, delay:1.1 })
     ];
-    Promise.all(opening).then(() => { opening = []; });
   }
-  // any click or key finishes the opening at once
-  const finish = () => {
-    if (!opening.length) return;
-    opening.forEach(c => c.stop()); opening = [];
-    setCover(true); setCamera(1);
-  };
-  addEventListener('keydown', finish);
-  document.getElementById('viewport').addEventListener('pointerdown', finish);
-  document.getElementById('replay').addEventListener('click', open);
 
-  addEventListener('resize', () => { layout(); if (!opening.length) setCamera(1); });
+  /* ---------- the writing ----------
+     One pen, one timeline: the name (slowly), then the contents. Every stroke is built
+     hidden, timed by its length and curvature, and revealed by render(t). */
+  const Ink = window.Ink;
+  const leftInk = document.getElementById('leftInk'), rightInk = document.getElementById('rightInk');
+  const penLayer = document.getElementById('penLayer'), subtitle = document.getElementById('subtitle');
+  const toc = document.getElementById('toc'), hint = document.getElementById('replay');
+  const ENTRIES = [
+    // lowercase numerals: a cursive capital I reads as a J
+    { text:'Projects', num:'i', href:'#projects' },
+    { text:'Writing', num:'ii', href:'#writing' },
+    { text:'About', num:'iii', href:'#about' },
+    { text:'Reach out', num:'iv', href:'#reach-out' }
+  ];
+  const NAME_TEMPO = 4, TEXT_TEMPO = 1.5;     // 1 = a brisk hand
+  const NAME_MS = 1350;                        // the name's pen-down time at tempo 1
+  const WRITE_DELAY = .15;                     // seconds after the cover is open and the camera has settled
+  const DRY_MS = 1200, PEN_ANGLE = 38, REST_ANGLE = 72;   // at rest the pen lies upright in the margin
+  let ink = null, rows = [], penG = null, shadowG = null, penScale = 1, penPos = [0, 0];
+
+  const toBook = (page, p) => page === 'right' ? [p[0] + pageW(), p[1]] : p;
+  function restPos(){
+    const W = innerWidth, H = innerHeight, pw = pageW(), ph = pw * 1.3;
+    const w = isPortrait() ? [W * .74 - finalX(), H * .86] : [W / 2 + pw + Math.min(W * .05, 60), H * .3];   // on the desk, right of the book
+    return [w[0] - (W / 2 - pw), w[1] - (H / 2 - ph / 2)];
+  }
+  let msPerWeight = 0;
+  function calibrate(){
+    if (!msPerWeight) msPerWeight = NAME_MS / Ink.phrase('Angela Santurbano').strokes.reduce((a, st) => a + Ink.timing(st.pts).weight, 0);
+    return msPerWeight;
+  }
+
+  function buildInk(){
+    const pw = pageW(), ph = pw * 1.3;
+    for (const svg of [leftInk, rightInk]){ svg.innerHTML = ''; svg.setAttribute('viewBox', `0 0 ${pw} ${ph}`); }
+    toc.innerHTML = ''; rows = [];
+    const jobs = [];
+
+    // the name, inside the front cover
+    const nP = Ink.phrase('Angela Santurbano'), nW = nP.bbox[2] - nP.bbox[0], sName = pw * .8 / nW, base = ph * .45;
+    const name = Ink.prepare(leftInk, nP.strokes, { x:(pw - nW * sName) / 2 - nP.bbox[0] * sName, y:base, s:sName });
+    jobs.push({ page:'left', strokes:name.strokes, tempo:NAME_TEMPO, after:'subtitle' });
+    subtitle.style.top = `${base + ph * .075}px`;
+
+    // the contents, on the first page
+    const sText = pw * .074 / 1000, sHead = sText * 1.1, sNum = sText * .85;
+    const cP = Ink.phrase('Contents');
+    jobs.push({ page:'right', tempo:TEXT_TEMPO, before:'contents', pause:isPortrait() ? 900 : 0,
+      strokes:Ink.prepare(rightInk, cP.strokes, { x:pw * .13 - cP.bbox[0] * sHead, y:ph * .17, s:sHead }).strokes });
+    const left = pw * .15, right = pw * .86;
+    ENTRIES.forEach((e, i) => {
+      const y = ph * (.31 + i * .1);
+      const tP = Ink.phrase(e.text), mP = Ink.phrase(e.num);
+      const tW = (tP.bbox[2] - tP.bbox[0]) * sText, mW = (mP.bbox[2] - mP.bbox[0]) * sNum;
+      const title = Ink.prepare(rightInk, tP.strokes, { x:left - tP.bbox[0] * sText, y, s:sText });
+      const num = Ink.prepare(rightInk, mP.strokes, { x:right - mW - mP.bbox[0] * sNum, y, s:sNum });
+      // the dotted leader: the pen taps out each dot
+      const d0 = left + tW + pw * .035, d1 = right - mW - pw * .035, gap = pw * .026;
+      const count = Math.max(0, Math.floor((d1 - d0) / gap) + 1);
+      const dotStrokes = Array.from({ length:count }, (_, k) => { const X = (d0 + k * gap) / sText; return { pts:[X, -10, X + 12, -6], word:k }; });
+      const dots = Ink.prepare(rightInk, dotStrokes, { x:0, y, s:sText });
+      jobs.push({ page:'right', tempo:TEXT_TEMPO, strokes:title.strokes });
+      jobs.push({ page:'right', tempo:TEXT_TEMPO, strokes:dots.strokes, hop:true });
+      jobs.push({ page:'right', tempo:TEXT_TEMPO, strokes:num.strokes });
+
+      // the entry itself is a real link over the row
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = e.href; a.textContent = `${e.text}, section ${e.num}`;
+      Object.assign(a.style, { left:`${left - pw * .02}px`, top:`${y - ph * .065}px`, width:`${right - left + pw * .04}px`, height:`${ph * .085}px` });
+      li.appendChild(a); toc.appendChild(li);
+      rows.push({ a, x0:left, x1:left + tW, y:y + ph * .02, s:sText, underline:null });
+      a.addEventListener('pointerenter', () => underline(i, true));
+      a.addEventListener('pointerleave', () => underline(i, false));
+      a.addEventListener('focus', () => underline(i, true));
+      a.addEventListener('blur', () => underline(i, false));
+    });
+
+    // the pen: drawn once, moved by placePen()
+    penLayer.innerHTML = '';
+    const defs = el('defs', {}, penLayer);
+    el('feGaussianBlur', { stdDeviation:3 }, el('filter', { id:'penBlur', x:'-20%', y:'-60%', width:'140%', height:'220%' }, defs));
+    shadowG = el('g', { filter:'url(#penBlur)', opacity:.5 }, penLayer); Ink.pen(shadowG, '#0E0805');
+    penG = el('g', {}, penLayer); Ink.pen(penG);
+    penScale = pw * .78 / 270;
+
+    timeline(jobs);
+  }
+
+  function timeline(jobs){
+    const W8 = calibrate(), segs = [], strokes = [], events = [];
+    let t = 0, pos = restPos(), first = true;
+    for (const job of jobs){
+      job.strokes.forEach((st, i) => {
+        const to = toBook(job.page, Ink.start(st)), dist = Math.hypot(to[0] - pos[0], to[1] - pos[1]);
+        let gap, lift;
+        if (i === 0){                                                        // over to the next phrase
+          if (job.before) events.push({ t, name:job.before });
+          gap = 240 + dist * .9 + (job.pause || 0); lift = 1;
+        }
+        else if (job.hop){ gap = 24; lift = .25; }                          // dot to dot, quick taps
+        else {
+          const sameWord = st.word === job.strokes[i - 1].word;
+          gap = ((sameWord ? 55 : 140) + dist / st.s * .035) * Math.sqrt(job.tempo);   // a slow hand still lifts briskly
+          lift = sameWord ? .55 : 1;
+        }
+        segs.push({ type:'move', from:pos, to, t0:t, t1:t += gap, lift, fromRest:first });
+        first = false;
+        const dur = job.hop ? 30 : st.tm.weight * W8 * job.tempo;
+        st.t0 = t; st.t1 = t + dur;
+        segs.push({ type:'write', st, page:job.page, t0:t, t1:t += dur });
+        strokes.push(st);
+        pos = toBook(job.page, Ink.end(st));
+      });
+      if (job.after) events.push({ t, name:job.after });
+    }
+    segs.push({ type:'move', from:pos, to:restPos(), t0:t, t1:t += 800, lift:1, toRest:true });
+    ink = { segs, strokes, events, T:t + DRY_MS, seg:0, ev:0 };
+  }
+
+  function frac(st, t){
+    const tm = st.tm, target = (t - st.t0) / (st.t1 - st.t0) * tm.weight;
+    let lo = 0, hi = tm.time.length - 1;
+    while (hi - lo > 1){ const mid = (lo + hi) >> 1; if (tm.time[mid] < target) lo = mid; else hi = mid; }
+    const f = (target - tm.time[lo]) / ((tm.time[hi] - tm.time[lo]) || 1);
+    return Math.min(1, (tm.len[lo] + (tm.len[hi] - tm.len[lo]) * f) / tm.total);
+  }
+
+  function placePen(p, lift, rest){
+    penPos = p;
+    const a = PEN_ANGLE + (REST_ANGLE - PEN_ANGLE) * rest, k = penScale;
+    penG.setAttribute('transform', `translate(${p[0]} ${p[1]}) rotate(${a}) scale(${k * (1 + .05 * lift)})`);
+    // lit from the lamp at the top left: the shadow falls down and right, meeting the nib on the paper
+    shadowG.setAttribute('transform', `translate(${p[0] + (3 + 30 * lift) * k} ${p[1] + (4 + 45 * lift) * k}) rotate(${a + 4 + 3 * lift}) scale(${k})`);
+    shadowG.setAttribute('opacity', (.5 - .2 * lift).toFixed(2));
+  }
+
+  function render(t, instant){
+    for (const st of ink.strokes){
+      if (t < st.t0){ Ink.show(st, -1); continue; }
+      Ink.show(st, t >= st.t1 ? 1 : frac(st, t), t < st.t1 ? 1 : Math.max(0, 1 - (t - st.t1) / DRY_MS));
+    }
+    if (t < ink.segs[ink.seg].t0) ink.seg = 0;
+    while (ink.seg < ink.segs.length - 1 && t >= ink.segs[ink.seg].t1) ink.seg++;
+    const g = ink.segs[ink.seg];
+    if (g.type === 'write') placePen(toBook(g.page, Ink.at(g.st, frac(g.st, t))), 0, 0);
+    else {
+      const f = Math.min(1, Math.max(0, (t - g.t0) / (g.t1 - g.t0))), e = f * f * (3 - 2 * f);
+      const rest = g.fromRest ? 1 - e : g.toRest ? e : 0;
+      placePen([g.from[0] + (g.to[0] - g.from[0]) * e, g.from[1] + (g.to[1] - g.from[1]) * e], Math.sin(Math.PI * f) * g.lift, rest);
+    }
+    if (t < (ink.events[ink.ev - 1] || { t:-1 }).t) ink.ev = 0;
+    while (ink.ev < ink.events.length && t >= ink.events[ink.ev].t) fire(ink.events[ink.ev++].name, instant);
+  }
+  let panAnim = null;
+  function fire(name, instant){
+    if (name === 'contents' && isPortrait() && !instant && M && !reduceMotion){
+      panAnim = M.animate(cam.x, finalX(), { duration:1, ease:[.45, 0, .2, 1], onUpdate:(v) => { cam.x = v; cam.targetX = v; applyCamera(); } });
+    }
+    if (name === 'subtitle'){
+      if (instant || !M || reduceMotion){ subtitle.style.opacity = 1; subtitle.style.transform = ''; }
+      else M.animate(subtitle, { opacity:[0, 1], y:[6, 0] }, { duration:.9, ease:'easeOut' });
+    }
+  }
+
+  /* ---------- playback: first visit only, skippable, replayable ---------- */
+  let writing = null;
+  const seen = () => { try { return localStorage.getItem('notebook.seen') === '1'; } catch (e) { return false; } };
+  const markSeen = () => { try { localStorage.setItem('notebook.seen', '1'); } catch (e) {} };
+  function setHint(mode){
+    hint.dataset.mode = mode;
+    hint.textContent = mode === 'skip' ? 'click anywhere to skip' : 'watch it written';
+    if (mode === 'skip' && M && !reduceMotion){ hint.style.opacity = 0; M.animate(hint, { opacity:[0, 1] }, { duration:.8, delay:2 }); }
+    else hint.style.opacity = '';
+  }
+  function showFinished(){
+    run++;
+    if (writing){ writing.stop(); writing = null; }
+    opening.forEach(c => c.stop()); opening = [];
+    panAnim && panAnim.stop();
+    cam.targetX = null;
+    setCover(true); setCamera(1);
+    render(ink.T, true);
+    setHint('replay');
+  }
+  let run = 0;   // bumped on every play/skip, so a stale chain never starts the pen
+  function play(){
+    if (!M || reduceMotion){ showFinished(); markSeen(); return; }
+    const me = ++run;
+    cam.targetX = nameX();
+    open();
+    subtitle.style.opacity = 0;
+    ink.seg = 0; ink.ev = 0; render(0);
+    setHint('skip');
+    // the pen sets off once the cover is open and the camera has settled
+    Promise.all(opening).then(() => {
+      if (me !== run) return;
+      opening = [];
+      writing = M.animate(0, ink.T, { duration:ink.T / 1000, delay:WRITE_DELAY, ease:'linear', onUpdate:(t) => render(t),
+        onComplete:() => { writing = null; markSeen(); setHint('replay'); } });
+    });
+  }
+  const playing = () => !!writing || opening.length > 0;
+  // any click or key during the opening finishes it at once
+  const skip = () => { if (playing()){ showFinished(); markSeen(); } };
+  addEventListener('keydown', (e) => { if (e.key !== 'Tab') skip(); });
+  document.getElementById('viewport').addEventListener('pointerdown', skip, true);
+  hint.addEventListener('click', () => { if (playing()) skip(); else play(); });
+
+  /* ---------- hovering an entry: the pen comes over and underlines it ---------- */
+  let penAnim = null;
+  function underline(i, on){
+    if (playing()) return;
+    const row = rows[i], pw = pageW();
+    penAnim && penAnim.stop();
+    if (!on){
+      if (row.underline){
+        const st = row.underline; row.underline = null;
+        if (M && !reduceMotion) M.animate(st.g, { opacity:0 }, { duration:.4 }).then(() => st.g.remove()); else st.g.remove();
+      }
+      if (rows.some(r => r.underline)) return;
+      const from = penPos, to = restPos();
+      if (!M || reduceMotion){ placePen(to, 0, 1); return; }
+      penAnim = M.animate(0, 1, { duration:.6, ease:'easeInOut', onUpdate:(f) => placePen([from[0] + (to[0] - from[0]) * f, from[1] + (to[1] - from[1]) * f], Math.sin(Math.PI * f), f) });
+      return;
+    }
+    if (row.underline) return;
+    // a gently wavering line under the entry, in font units at the entry's scale
+    const pts = [];
+    for (let k = 0; k <= 10; k++){ pts.push((row.x0 + (row.x1 - row.x0) * k / 10) / row.s, Math.sin(k * .8) * 14); }
+    const st = Ink.prepare(rightInk, [{ pts }], { x:0, y:row.y, s:row.s }).strokes[0];
+    row.underline = st;
+    if (!M || reduceMotion){ Ink.show(st, 1, 0); return; }
+    const from = penPos, to = toBook('right', Ink.start(st));
+    penAnim = M.animate(0, 1, { duration:.75, ease:'linear', onUpdate:(f) => {
+      if (f < .45){ const g = f / .45, e = g * g * (3 - 2 * g); placePen([from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e], Math.sin(Math.PI * g) * .7, 0); }
+      else { const g = (f - .45) / .55; Ink.show(st, g, 1); placePen(toBook('right', Ink.at(st, g)), 0, 0); }
+    }, onComplete:() => Ink.show(st, 1, 0) });
+  }
+
+  addEventListener('resize', () => { const was = playing(); showFinished(); if (was) markSeen(); layout(); buildInk(); render(ink.T, true); });
 
   /* ---------- dev check: is every word readable at the dimmest lamp? (?debug) ---------- */
   if (location.search.includes('debug')){
@@ -440,7 +671,7 @@
     const hex = (h) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
     window.contrastReport = (Lv = .25) => {
       // worst case over the whole left page, in desk coordinates
-      const pw = pageW(), ph = pw * 1.4, W = state.W, H = state.H;
+      const pw = pageW(), ph = pw * 1.3, W = state.W, H = state.H;
       const pts = [[W / 2 - pw, H / 2 - ph / 2], [W / 2, H / 2 - ph / 2], [W / 2 - pw, H / 2 + ph / 2], [W / 2, H / 2 + ph / 2]];
       return [['name', '#1B2433'], ['subtitle', '#3B3530']].map(([what, color]) => {
         let worst = 99;
@@ -454,7 +685,7 @@
     };
   }
 
-  function start(){ layout(); open(); }
+  function start(){ layout(); buildInk(); if (seen()) showFinished(); else play(); }
   (document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
 })();
 </script>
