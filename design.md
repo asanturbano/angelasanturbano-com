@@ -2,7 +2,7 @@
 
 ## The one-line brief
 
-A notebook open on a walnut desk under a single lamp, seen from the front of the desk at a gentle angle. A fountain pen writes Angela's name and a table of contents in blue-black ink on vellum; below it, the same pen draws Franklin in pen and ink. The visitor can turn the lamp up or down and switch on the rain. Everything about the craft should feel like a real desk on a real evening — and the work should be two clicks away for anyone in a hurry.
+A notebook open on a walnut desk under a single lamp, seen from the front of the desk at a gentle angle. A fountain pen writes Angela's name and a table of contents in blue-black ink on vellum; below it, the same pen draws Franklin in pen and ink. The visitor can turn the lamp up or down and switch on the radio. Everything about the craft should feel like a real desk on a real evening — and the work should be two clicks away for anyone in a hurry.
 
 ## Design principles
 
@@ -18,9 +18,10 @@ A notebook open on a walnut desk under a single lamp, seen from the front of the
 
 - **Camera:** sitting at the front of the desk, looking down at about 32° from overhead (about 22° on phones) — enough to see that the lamp stands up off the desk, gentle enough that writing stays legible. The opening starts straight overhead and close on the closed notebook, then pulls back and tilts once, as the cover opens, revealing the lamp. The camera doesn't move after that. (For review, `?tilt=N` overrides the angle.)
 - **The lamp:** a brass architect's lamp — a beveled, weighted base behind and left of the notebook, a jointed arm, and a conical enamel shade (blue-black, like the ink) angled down toward the page, with lamplight catching the lip of its rim. A cone, not a dome: seen from above, a dome reads as a ball.
-- **Layout (desktop):** the open notebook sits centered. The lamp stands off the top-left corner — a right-handed writer keeps the lamp on the left so the hand doesn't shadow the page, and the pen comes in from the right. The lamp's cord runs down the left side of the desk, with the dimmer on it. The pen rests on the desk to the right of the notebook; a small radio will sit in the bottom-right corner.
+- **Layout (desktop):** the open notebook sits centered. The lamp stands off the top-left corner — a right-handed writer keeps the lamp on the left so the hand doesn't shadow the page, and the pen comes in from the right. The lamp's cord runs down the left side of the desk, with the dimmer on it. A small blue-black and brass radio stands at the back of the right margin, with the pen resting on the desk below it.
 - **The spread:** the left side is the inside of the front cover, where the name is written — the way you'd write your name inside a new notebook. The first page, on the right, holds the contents.
-- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time). The camera opens on the name page, then — once the name is written — pans across to the contents page and rests there, since the contents are the navigation. The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio will tuck into the bottom right.
+- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time). The camera opens on the name page, then — once the name is written — pans across to the contents page and rests there, since the contents are the navigation. The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio at the top right.
+- **A souvenir:** a postcard from the old site — a dark card with a string of red lanterns, lettered *Angela's Night Market · the old site →* — is tucked under the notebook's left edge, most of it showing. Reach for it and it slides a little way out; click it and you're back at the night market. (A phone has no free desk for it; the About page links to the old site too.)
 - **The pages:** the contents and each section are leaves, in order: Contents, Projects, Writing, About, Reach out. A turned leaf lies on the left, its writing showing through the vellum reversed and faint.
 - **The arrow guide:** below the notebook, in small italic print — *← Contents · Writing →* — naming the previous and next pages. The arrow keys turn pages too, Esc goes back to the contents, and the browser's Back button pages backward.
 
@@ -88,7 +89,7 @@ Any click or key during the opening finishes it instantly, and a small printed l
 - **Addresses:** each section has its own (`#projects`, `#writing`, `#about`, `#reach-out`). A link straight to one skips the opening and lands on that page.
 - **Turning back:** the page turns back left to right — never floating in from elsewhere. Returning to the contents puts focus back on the entry you came from.
 - **On a phone:** the arrow guide includes the name page — *← First page* from the contents, *Contents →* from the name page — and the camera pans between them.
-- **Ambient motion** (barely noticeable — if a visitor can name the animation, it's too strong): a faint flicker in the lamp's filament, rain streaks in the window-light on the desk when the rain is on, the pen's slow idle sway in the margin.
+- **Ambient motion** (barely noticeable — if a visitor can name the animation, it's too strong): a faint flicker in the lamp's filament, the pen's slow idle sway in the margin.
 
 ### Reduced motion
 
@@ -104,11 +105,11 @@ Any click or key during the opening finishes it instantly, and a small printed l
 
 ## Sound
 
-- Always off until the visitor turns it on with the radio. Nothing ever autoplays.
-- **Rain:** generated in code (filtered noise and scattered droplets), at a gentle default volume.
-- **Pen scratch:** a faint nib-on-paper sound that follows the pen's speed, heard only while the pen writes and only when sound is on.
-- The radio shows its state clearly (on or off), is a real toggle button for keyboard and screen readers, and remembers the choice.
-- Audio only loads once the visitor turns sound on.
+- Always off until the visitor turns it on with the radio. Nothing ever autoplays. A visitor who left it on last time hears it resume at their first click or key press — never before.
+- **The radio:** a 1930s cathedral set (Philco 90 style) — walnut cabinet with a pointed gothic arch and bookmatched veneer, fretwork over a cloth grille, a small arched dial with a brass bezel, three bakelite knobs. It's drawn close to true scale — always about half a page wide, so it keeps its proportion to the notebook at any window size — standing just past the notebook's fore-edge, so the frame crops its far side the way it crops the lamp. On a phone it stands just behind the top corner of the page. Switched on, the dial lights amber, the grille glows faintly from the tubes behind it, and the needle moves. It's a real toggle button (`aria-pressed`) and remembers the choice.
+- **Music:** Satie's *Gymnopédie No. 1* (Robin Alciatore, Musopen — public domain, from Wikimedia Commons; see `notebook/audio/CREDITS.md`), 3:04, looped, as 96 kbps AAC (about 2.3 MB). It plays through a gentle valve-radio filter (a narrower, warmer band), fades in over about two seconds and out in under one. While it plays, the radio's label credits the recording.
+- **Pen scratch:** a faint nib-on-paper sound — bright, band-limited noise, generated — whose level follows the pen's speed, heard only while the nib is on the paper and only when sound is on.
+- Nothing audio loads until the radio is switched on; switched off, the music pauses once it has faded.
 
 ## Voice
 

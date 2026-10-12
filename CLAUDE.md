@@ -15,7 +15,7 @@ The pages are vellum: translucent, so the sheets underneath show faintly through
 Visitors can make the desk their own:
 
 - **The lamp** — dim or brighten it (pull chain, or the dimmer on its base). More light makes the vellum more see-through.
-- **Rain** — a small radio on the desk turns on the sound of rain, and the pen's nib scratches faintly as it writes. Sound is always off until the visitor turns it on.
+- **Music** — a 1930s cathedral radio on the desk plays Satie's *Gymnopédie No. 1* (a public-domain recording), and the pen's nib scratches faintly as it writes. Sound is always off until the visitor turns it on.
 
 Choices are remembered in the visitor's own browser. There is no choice screen at the door — the desk works with its defaults and the controls are part of the scene.
 
@@ -53,7 +53,7 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
   - first-visit-only opening: return visits land on the finished contents page, with a small "watch it written" link to replay
   - readable text at the lamp's dimmest setting (contrast at least 4.5:1)
   - a web address per section (`#projects`, `#writing`, `#about`, `#reach-out`)
-- Performance budget: 60fps on a mid-tier laptop, smooth on mobile Safari. Audio loads only when sound is turned on.
+- Performance budget: 60fps on a mid-tier laptop, smooth on mobile Safari. Audio loads only when the radio is switched on.
 - Work one feature at a time. Propose the approach in 2–3 sentences before writing code. After each change, list what to manually test.
 
 ## Build order (each step ends with my review)
@@ -63,5 +63,5 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
 3. **The desk** — notebook opening, lamp with dimmer, the light pool, vellum translucency.
 4. **Contents page** — the full writing sequence, skip, hover underline, Franklin drawn in, reduced motion, first-visit-only replay.
 5. **Section pages** — page turns forward and back, the arrow guide below the book, the four sections, per-section addresses.
-6. **Sound** — rain and pen scratch, generated in code.
+6. **Sound** — a 1930s radio playing a public-domain recording, and a generated pen scratch.
 7. **Polish** — mobile, accessibility, search and sharing metadata. Then I decide whether this replaces `main`.

@@ -20,7 +20,7 @@
     --veil:.88;            /* vellum opacity: set by the lamp — more light, more show-through */
   }
   @media (orientation: portrait), (max-width: 760px){
-    :root{ --page-w:min(84vw, 62vh); }
+    :root{ --page-w:min(84vw, 48vh); }   /* by height too, so a short window keeps room for the lamp, radio and guide */
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;overflow:clip;background:#140D09}
@@ -47,6 +47,30 @@
   #lampBtn{position:absolute;border-radius:50%;border:0;background:transparent;cursor:pointer;pointer-events:auto}
   #lampBtn:focus-visible{outline:2px solid #FFD9A0;outline-offset:6px}
   #cord{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
+
+  /* ---------- a souvenir from the old site: a night market postcard, tucked under the notebook ---------- */
+  #souvenir{position:absolute;z-index:1;display:block;left:var(--card-x);top:var(--card-y);width:var(--card-w);height:calc(var(--card-w) * .64);
+    transform:rotate(-9deg);transform-origin:85% 15%;border-radius:2px;text-decoration:none;overflow:hidden;
+    background:radial-gradient(ellipse 70% 55% at 50% 28%, rgba(232,80,46,.28), rgba(232,80,46,0) 70%), linear-gradient(170deg,#21160F,#0E0907);
+    box-shadow:0 6px 16px rgba(8,4,2,.6), inset 0 0 0 1px rgba(255,217,160,.08);transition:transform .45s cubic-bezier(.3,.7,.3,1)}
+  #souvenir svg{position:absolute;inset:0;width:100%;height:100%}
+  /* it slides a little way out from under the book when you reach for it */
+  #souvenir:hover, #souvenir:focus-visible{transform:rotate(-9deg) translate(-9%, 7%)}
+  #souvenir:focus-visible{outline:2px solid #FFD9A0;outline-offset:3px}
+  @media (prefers-reduced-motion: reduce){ #souvenir{transition:none} }
+  /* a phone has no free desk for it: there, the About page links to the old site instead */
+  @media (orientation: portrait), (max-width: 760px){ #souvenir{display:none} }
+
+  /* ---------- the radio: stands on the desk like the lamp, pinned to #radioAnchor ---------- */
+  #radioAnchor{position:absolute;width:100px;height:100px;left:calc(var(--radio-x) - 50px);top:calc(var(--radio-y) - 50px);pointer-events:none}
+  #radio{position:absolute;left:0;top:0;width:0;height:0;z-index:4;transform-origin:0 0;pointer-events:none}
+  #radio svg{position:absolute;overflow:visible;left:0;top:0}
+  #radioBtn{position:absolute;border:0;background:transparent;cursor:pointer;pointer-events:auto;border-radius:6px}
+  #radioBtn:focus-visible{outline:2px solid #FFD9A0;outline-offset:4px}
+  #radioLabel{position:absolute;white-space:nowrap;transform:translateX(-50%);font-size:13px;letter-spacing:.2em;
+    text-transform:uppercase;color:rgba(255,226,190,.62);pointer-events:none;text-align:center}
+  /* while it plays, the radio credits the recording (Musopen asks for in-line attribution) */
+  #radioLabel .credit{display:block;margin-top:.35em;font-style:italic;font-size:12px;letter-spacing:.02em;text-transform:none;color:rgba(255,226,190,.5)}
 
   /* ---------- the notebook ---------- */
   #book{position:absolute;z-index:2;
@@ -185,6 +209,22 @@
     <div id="desk"></div>
     <svg id="cord" aria-hidden="true"><path fill="none" stroke="#120C08" stroke-width="5" stroke-linecap="round"/></svg>
 
+    <a id="souvenir" href="../night-market.html" aria-label="A postcard from the previous version of this site, Angela's Night Market">
+      <svg viewBox="0 0 320 205" aria-hidden="true">
+        <path d="M-10 44 Q 160 86 330 40" fill="none" stroke="rgba(255,217,160,.35)" stroke-width="1.4"/>
+        <g>
+          <circle cx="34" cy="55" r="9" fill="#E8502E"/><circle cx="34" cy="55" r="20" fill="rgba(255,140,66,.18)"/>
+          <circle cx="98" cy="67" r="9" fill="#FF8C42"/><circle cx="98" cy="67" r="20" fill="rgba(255,140,66,.18)"/>
+          <circle cx="162" cy="71" r="9" fill="#C73E2A"/><circle cx="162" cy="71" r="20" fill="rgba(255,140,66,.18)"/>
+          <circle cx="226" cy="66" r="9" fill="#E8502E"/><circle cx="226" cy="66" r="20" fill="rgba(255,140,66,.18)"/>
+          <circle cx="290" cy="54" r="9" fill="#FF8C42"/><circle cx="290" cy="54" r="20" fill="rgba(255,140,66,.18)"/>
+        </g>
+        <!-- lettered on the left, the part that peeks out from under the notebook -->
+        <text x="20" y="122" fill="rgba(255,217,160,.7)" font-family="EB Garamond, serif" font-size="17" letter-spacing="4">ANGELA'S</text>
+        <text x="20" y="152" fill="#FFD9A0" font-family="EB Garamond, serif" font-size="29" letter-spacing="4">NIGHT MARKET</text>
+        <text x="20" y="182" fill="rgba(255,217,160,.62)" font-family="EB Garamond, serif" font-style="italic" font-size="18">the old site →</text>
+      </svg>
+    </a>
     <div id="book">
       <div class="shadow" id="shadowClosed"></div>
       <div class="shadow" id="shadowOpen"></div>
@@ -214,6 +254,7 @@
     </div>
 
     <div id="lampAnchor"></div>
+    <div id="radioAnchor"></div>
     <div id="light"></div>
     <div id="glow"></div>
     <div id="dimmer">
@@ -224,6 +265,11 @@
   <div id="lamp">
     <svg id="lampArt" aria-hidden="true"></svg>
     <button id="lampBtn" type="button" aria-label="Lamp: turn down"></button>
+  </div>
+  <div id="radio">
+    <svg id="radioArt" aria-hidden="true"></svg>
+    <button id="radioBtn" type="button" aria-pressed="false" aria-label="Radio: Satie, Gymnopédie No. 1"></button>
+    <div id="radioLabel" aria-hidden="true">Music · off</div>
   </div>
 </div>
 <div class="sr-only" id="announce" aria-live="polite"></div>
@@ -262,10 +308,24 @@
     // Placed by where they should land on screen once the book is open; the world is
     // shifted on phones (to center the left page), so subtract that shift.
     const shift = finalX();
+    const pwNow = pageW(), phNow = pwNow * 1.3;
     const lamp = portrait ? { x:W * .24 - shift, y:H * .22 } : { x:W * .19, y:H * .42 };   // the pool, under the shade
     const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:H * .86 } : { x:Math.max(46, W * .05), y:H * .6 };    // in the left margin, along the cord (turned upright by CSS)
     root.style.setProperty('--lamp-x', `${lamp.x}px`); root.style.setProperty('--lamp-y', `${lamp.y}px`);
     root.style.setProperty('--dim-x', `${dim.x}px`); root.style.setProperty('--dim-y', `${dim.y}px`);
+    // the postcard: tucked under the front corner of the notebook, most of it showing
+    // (higher than the corner itself: the tilt spreads the desk's front edge off-screen)
+    const cardW = Math.min(pwNow * .36, (W / 2 - pwNow) + pwNow * .1), cornerX = W / 2 - pwNow, cornerY = H / 2 + phNow / 2;
+    root.style.setProperty('--card-w', `${cardW}px`);
+    root.style.setProperty('--card-x', `${cornerX + pwNow * .1 - cardW}px`);
+    root.style.setProperty('--card-y', `${cornerY - pwNow * .3}px`);
+    // the radio: true to scale, standing just past the notebook's fore-edge; the frame crops its far side
+    const ru = pageW() / 400;
+    // always about half a page wide, so it keeps its proportion to the notebook at any window size.
+    // Wide: just past the fore-edge, further back where the tilt draws it inward. Portrait: standing
+    // just behind the top corner of the page in view (screen position, so subtract the camera's shift).
+    const radio = portrait ? { x:W / 2 + pwNow / 2 - shift, y:H / 2 - phNow / 2 - RADIO.d * ru * 1.2 } : { x:W / 2 + pwNow + 34 + RADIO.w * ru, y:H * .46 };
+    root.style.setProperty('--radio-x', `${radio.x}px`); root.style.setProperty('--radio-y', `${radio.y}px`);
 
     const u = pageW() / 400;                       // lamp proportions follow the notebook
     const base = { x:-165 * u, y:-125 * u };       // the base sits behind and left of the pool
@@ -370,6 +430,162 @@
     Object.assign(lampBtn.style, { left:`${Math.min(...xs)}px`, top:`${Math.min(...ys)}px`, width:`${Math.max(...xs) - Math.min(...xs)}px`, height:`${Math.max(...ys) - Math.min(...ys)}px` });
   }
 
+  /* ---------- the radio ----------
+     A 1930s cathedral set (think Philco 90): a walnut cabinet with a pointed gothic arch,
+     fretwork over a cloth grille, a small arched dial and three knobs. It's drawn at true
+     scale beside the notebook, so the edge of the frame crops it — like the lamp. Built
+     from 3D points like the lamp: the crown first, then the front face over it. */
+  const radioEl = document.getElementById('radio'), radioArt = document.getElementById('radioArt');
+  const radioBtn = document.getElementById('radioBtn'), radioAnchor = document.getElementById('radioAnchor'), radioLabel = document.getElementById('radioLabel');
+  const RADIO = { w:100, h:280, d:58 };   // half width, height, half depth, in lamp units: a cathedral set, about 3:4 wide to tall
+  // a pointed arch of half width w springing at height zs, peaking at apex, sampled left to right
+  function gothicArch(w, zs, apex, n = 16){
+    const rise = apex - zs, R = (rise * rise + w * w) / (2 * w), ta = Math.acos((R - w) / R), pts = [];
+    for (let i = 0; i <= n; i++){ const t = ta * i / n; pts.push([-(w - R) - R * Math.cos(t), zs + R * Math.sin(t)]); }   // left side, rising
+    for (let i = n - 1; i >= 0; i--){ const t = ta * i / n; pts.push([(w - R) + R * Math.cos(t), zs + R * Math.sin(t)]); } // right side, falling
+    return pts;
+  }
+  function drawRadio(){
+    if (!state.u) return;
+    const r = radioAnchor.getBoundingClientRect(), k = r.width / 100;
+    radioEl.style.transform = `translate(${r.left + r.width / 2}px, ${r.top + r.height / 2}px) scale(${k})`;
+    const T = cam.tilt * Math.PI / 180, c = Math.cos(T), sn = Math.sin(T), u = state.u;
+    const w = RADIO.w * u, h = RADIO.h * u, d = RADIO.d * u, on = Sound.on;
+    const P = (x, y, z) => [x, y * c - z * sn];
+    const face = (pts, y) => pts.map(([x, z]) => P(x, y, z));
+    const path = (pts, close = true) => 'M' + pts.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(' L') + (close ? ' Z' : '');
+    const g = radioArt; g.innerHTML = '';
+    const defs = el('defs', {}, g);
+    const lin = (id, stops, a) => { const lg = el('linearGradient', { id, ...a }, defs); stops.forEach(([o, col]) => el('stop', { offset:o, 'stop-color':col }, lg)); };
+    lin('walnut', [[0, '#6B3D24'], [.5, '#5A321D'], [1, '#3E2213']], { x1:0, x2:0, y1:0, y2:1 });
+    lin('veneer', [[0, 'rgba(255,214,170,0)'], [.5, 'rgba(255,214,170,.14)'], [1, 'rgba(255,214,170,0)']], { x1:0, x2:1, y1:0, y2:0 });
+    lin('crown', [[0, '#8A5634'], [1, '#5E3520']], { x1:0, x2:0, y1:0, y2:1 });
+    lin('dialGlow', on ? [[0, '#FFE6B8'], [1, '#F0A050']] : [[0, '#4A4032'], [1, '#2E281F']], { x1:0, x2:0, y1:0, y2:1 });
+    el('feGaussianBlur', { stdDeviation:6 * u }, el('filter', { id:'radioSoft', x:'-50%', y:'-50%', width:'200%', height:'200%' }, defs));
+
+    const body = [[-w, 0], [w, 0]].concat(gothicArch(w, h * .56, h).reverse().map(([x, z]) => [-x, z]));   // base, then the arch from right to left
+    // shadow on the desk
+    const [, gy] = P(0, d, 0);
+    el('ellipse', { cx:8 * u, cy:gy - d * c, rx:w * 1.15, ry:d * c * 1.3 + 4 * u, fill:'rgba(6,3,1,.55)', filter:'url(#radioSoft)' }, g);
+    // the crown: the whole cabinet's outline, front and back together, so its curved top reads as solid wood
+    el('path', { d:path(hull(face(body, -d).concat(face(body, d)))), fill:'url(#crown)' }, g);
+    // the front face, a plinth along its foot, bookmatched veneer down the middle, and the arch's molding
+    el('path', { d:path(face(body, d)), fill:'url(#walnut)' }, g);
+    el('path', { d:path(face(body, d)), fill:'url(#veneer)' }, g);
+    el('path', { d:path(face([[-w * 1.04, 0], [w * 1.04, 0], [w * 1.04, h * .05], [-w * 1.04, h * .05]], d)), fill:'#2E190E' }, g);
+    el('path', { d:path(face(gothicArch(w * .9, h * .56, h * .955), d), false), fill:'none', stroke:'rgba(20,10,4,.55)', 'stroke-width':2.4 * u }, g);
+    for (const sx of [-1, 1]) el('path', { d:path(face([[sx * w * .9, h * .06], [sx * w * .9, h * .56]], d), false), stroke:'rgba(255,214,170,.18)', 'stroke-width':3 * u }, g);
+
+    // the grille: cloth behind gothic fretwork; lit from within when it's playing
+    const grille = [[-w * .6, h * .4], [w * .6, h * .4]].concat(gothicArch(w * .6, h * .64, h * .9).reverse().map(([x, z]) => [-x, z]));
+    el('path', { d:path(face(grille, d)), fill:'#C7B28A' }, g);
+    if (on) el('path', { d:path(face(grille, d)), fill:'rgba(255,170,90,.35)', filter:'url(#radioSoft)' }, g);
+    for (const fx of [-.42, -.14, .14, .42]) el('path', { d:path(face([[w * fx, h * .4], [w * fx, h * .86 - Math.abs(fx) * h * .3]], d), false), stroke:'#4A2816', 'stroke-width':4 * u }, g);
+    el('path', { d:path(face(gothicArch(w * .42, h * .62, h * .84), d), false), fill:'none', stroke:'#4A2816', 'stroke-width':3.5 * u }, g);
+    const [rcx, rcy] = P(0, d, h * .74);
+    el('circle', { cx:rcx, cy:rcy, r:w * .13, fill:'none', stroke:'#4A2816', 'stroke-width':3.5 * u }, g);
+    el('path', { d:path(face(grille, d)), fill:'none', stroke:'#2E190E', 'stroke-width':3 * u }, g);
+
+    // the dial: a small arched window with a brass bezel, glowing amber when on
+    const dial = [[-w * .2, h * .24], [w * .2, h * .24]].concat(gothicArch(w * .2, h * .3, h * .35, 8).reverse().map(([x, z]) => [-x, z]));
+    if (on) el('path', { d:path(face(dial, d)), fill:'rgba(255,190,110,.75)', filter:'url(#radioSoft)' }, g);
+    el('path', { d:path(face(dial, d)), fill:'url(#dialGlow)', stroke:'#C9A35A', 'stroke-width':2.4 * u }, g);
+    for (let i = 1; i < 7; i++){ const x = -w * .16 + w * .32 * i / 7; el('path', { d:path(face([[x, h * .31], [x, h * .29]], d), false), stroke:'rgba(30,20,10,.6)', 'stroke-width':1.2 * u }, g); }
+    const nx = -w * .14 + w * .28 * (on ? .66 : .25);
+    el('path', { d:path(face([[0, h * .245], [nx, h * .32]], d), false), stroke:'#7A2418', 'stroke-width':1.6 * u }, g);
+    // three bakelite knobs
+    for (const kx of [-.45, 0, .45]){
+      const [cx, cy] = P(w * kx, d, h * .13);
+      el('ellipse', { cx, cy:cy + 2 * u, rx:13 * u, ry:11 * u, fill:'#1C0F08' }, g);
+      el('ellipse', { cx, cy, rx:12 * u, ry:10 * u, fill:'#3A2112' }, g);
+      el('ellipse', { cx:cx - 3 * u, cy:cy - 3 * u, rx:4 * u, ry:3 * u, fill:'rgba(255,220,180,.25)' }, g);
+    }
+
+    radioArt.style.filter = `brightness(${(.6 + .4 * L).toFixed(3)})`;
+    const all = face(body, -d).concat(face(body, d)), xs = all.map((q) => q[0]), ys = all.map((q) => q[1]);
+    Object.assign(radioBtn.style, { left:`${Math.min(...xs)}px`, top:`${Math.min(...ys)}px`, width:`${Math.max(...xs) - Math.min(...xs)}px`, height:`${Math.max(...ys) - Math.min(...ys)}px` });
+    // the label sits on the desk at its left foot, where the frame won't crop it
+    // wide: on the desk at its foot; portrait: beside it, since its foot meets the top of the page
+    if (isPortrait()) Object.assign(radioLabel.style, { left:`${-w * 1.08}px`, top:`${P(0, -d, h)[1] + h * sn * .5}px`, transform:'translateX(-100%)', textAlign:'right' });
+    else Object.assign(radioLabel.style, { left:`${-w * .55}px`, top:`${gy + 14 * u}px`, transform:'translateX(-50%)', textAlign:'center' });
+  }
+
+  /* ---------- sound: music on the radio, and the pen's nib — never autoplayed ----------
+     Nothing loads until the radio is switched on. The music is a public-domain recording
+     from Wikimedia Commons, looped, and played through a gentle valve-radio filter. The
+     nib is generated: bright noise whose level follows the pen's speed, so it's only
+     heard while ink is going down. */
+  // Satie, Gymnopédie No. 1, played by Robin Alciatore — public domain via Musopen, from Wikimedia Commons
+  const TRACK = { src:'audio/radio.m4a', credit:'Satie, Gymnopédie No. 1 — Robin Alciatore, Musopen' };
+  const Sound = (() => {
+    let ctx = null, master = null, scratchGain = null, audio = null, pauseTimer = 0;
+    const api = { on:false };
+    function noise(seconds){
+      const n = Math.floor(ctx.sampleRate * seconds), b = ctx.createBuffer(1, n, ctx.sampleRate), out = b.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < n; i++){   // pink noise (Paul Kellet's filter)
+        const w = Math.random() * 2 - 1;
+        b0 = .99886 * b0 + w * .0555179; b1 = .99332 * b1 + w * .0750759; b2 = .969 * b2 + w * .153852;
+        b3 = .8665 * b3 + w * .3104856; b4 = .55 * b4 + w * .5329522; b5 = -.7616 * b5 - w * .016898;
+        out[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * .5362) * .11; b6 = w * .115926;
+      }
+      const f = Math.min(n >> 4, 2048);   // fade the seam so the loop never clicks
+      for (let i = 0; i < f; i++){ const a = i / f; out[i] *= a; out[n - 1 - i] *= a; }
+      return b;
+    }
+    const filter = (type, f, q = .7) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; return b; };
+    function build(){
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+      // the music: one looping recording, through the radio's narrower, warmer voice
+      audio = new Audio(TRACK.src);
+      audio.loop = true; audio.preload = 'auto';
+      const music = ctx.createGain(); music.gain.value = .85;
+      ctx.createMediaElementSource(audio).connect(filter('highpass', 110)).connect(filter('lowpass', 6500)).connect(music).connect(master);
+      // the nib on paper
+      const src = ctx.createBufferSource(); src.buffer = noise(3); src.loop = true;
+      scratchGain = ctx.createGain(); scratchGain.gain.value = 0;
+      src.connect(filter('highpass', 1800)).connect(filter('bandpass', 4200, 1.1)).connect(scratchGain).connect(master);
+      src.start();
+    }
+    api.set = (on) => {
+      api.on = on;
+      if (on && !ctx) build();
+      if (!ctx) return;
+      clearTimeout(pauseTimer);
+      if (on){ ctx.resume(); audio.play().catch(() => {}); }
+      master.gain.setTargetAtTime(on ? .7 : 0, ctx.currentTime, on ? .6 : .2);
+      if (!on) pauseTimer = setTimeout(() => { audio.pause(); ctx.suspend(); }, 1500);   // let it fade, then rest
+    };
+    // pen speed in px/ms; silent unless the nib is on the paper
+    api.scratch = (speed) => {
+      if (!api.on || !ctx) return;
+      const t = ctx.currentTime, level = Math.min(1, speed / .35) * .32;
+      scratchGain.gain.cancelScheduledValues(t);
+      scratchGain.gain.setTargetAtTime(level, t, .015);
+      scratchGain.gain.setTargetAtTime(0, t + .09, .04);   // if the pen stops reporting, fall silent
+    };
+    return api;
+  })();
+
+  // the switch: remembered, but only ever started by a click or key press
+  function setSound(on){
+    Sound.set(on);
+    radioBtn.setAttribute('aria-pressed', String(on));
+    radioLabel.innerHTML = on ? `Music · on<span class="credit">${TRACK.credit}</span>` : 'Music · off';
+    try { localStorage.setItem('notebook.sound', on ? '1' : '0'); } catch (e) {}
+    drawRadio();
+  }
+  radioBtn.addEventListener('click', (e) => { e.stopPropagation(); setSound(!Sound.on); });
+  let soundWanted = false;
+  try { soundWanted = localStorage.getItem('notebook.sound') === '1'; } catch (e) {}
+  if (soundWanted){
+    radioLabel.textContent = 'Music · on';   // the visitor turned it on last time: it resumes at their first touch
+    const resume = (e) => { removeEventListener('pointerdown', resume, true); removeEventListener('keydown', resume, true);
+      if (!Sound.on && !(e.target === radioBtn)) setSound(true); };
+    addEventListener('pointerdown', resume, true); addEventListener('keydown', resume, true);
+  }
+
   /* ---------- light model ---------- */
   // Multiplier stops (r, g, b) at distances from the lamp, in fractions of the larger viewport side.
   function stops(Lv){
@@ -404,7 +620,7 @@
     slider.value = Math.round(L * 100);
     slider.setAttribute('aria-valuetext', `${Math.round(L * 100)} percent`);
     lampBtn.setAttribute('aria-label', L > .3 ? 'Lamp: turn down' : 'Lamp: turn up');
-    drawLamp();
+    drawLamp(); drawRadio();
   }
 
   /* ---------- lamp controls ---------- */
@@ -434,7 +650,7 @@
   cam.targetX = null;   // where the camera pulls back to; null means its resting view
   function applyCamera(){
     world.style.transform = `translateX(${cam.x}px) scale(${cam.scale}) rotateX(${cam.tilt}deg)`;
-    drawLamp();
+    drawLamp(); drawRadio();
   }
   function setCamera(p){
     // p: 0 = close and straight overhead on the closed cover, 1 = pulled back, tilted
@@ -486,7 +702,7 @@
   const toBook = (page, p) => page === 'right' ? [p[0] + pageW(), p[1]] : p;
   function restPos(){
     const W = innerWidth, H = innerHeight, pw = pageW(), ph = pw * 1.3;
-    const w = isPortrait() ? [W * .74 - finalX(), H * .86] : [W / 2 + pw + Math.min(W * .05, 60), H * .3];   // on the desk, right of the book
+    const w = isPortrait() ? [W * .74 - finalX(), H * .86] : [W / 2 + pw + Math.min(W * .05, 60), H * .06];   // on the desk, right of the book, behind the radio
     return [w[0] - (W / 2 - pw), w[1] - (H / 2 - ph / 2)];
   }
   let msPerWeight = 0;
@@ -603,7 +819,11 @@
     return Math.min(1, (tm.len[lo] + (tm.len[hi] - tm.len[lo]) * f) / tm.total);
   }
 
+  let lastPen = null;
   function placePen(p, lift, rest){
+    const now = performance.now();
+    if (lastPen && lift < .05 && rest < .05){ const dt = now - lastPen.t; if (dt > 0 && dt < 120) Sound.scratch(Math.hypot(p[0] - lastPen.p[0], p[1] - lastPen.p[1]) / dt); }
+    lastPen = { p, t:now };
     penPos = p;
     const a = PEN_ANGLE + (REST_ANGLE - PEN_ANGLE) * rest, k = penScale;
     penG.setAttribute('transform', `translate(${p[0]} ${p[1]}) rotate(${a}) scale(${k * (1 + .05 * lift)})`);
@@ -679,7 +899,8 @@
     about:{ title:'About', html:`
       <p>Angela Santurbano is a builder PM: ten years shipping payments and AI systems at Block&#8202;/&#8202;Square, Meta, Brex, and Cocoon — and lately, deep in voice AI.</p>
       <p>She prototypes her own ideas with agentic coding tools, writes about it as she goes, and believes the best product specs are working demos.</p>
-      <p>Based in San Francisco. The dog under the contents is Franklin, a Sheltie of strong opinions and excellent recall.</p>` },
+      <p>Based in San Francisco. The dog under the contents is Franklin, a Sheltie of strong opinions and excellent recall.</p>
+      <p>An earlier version of this site — a night market, with Franklin as your guide — is <a href="../night-market.html">still open</a>.</p>` },
     'reach-out':{ title:'Reach out', html:`<ul>
       <li><a href="https://www.linkedin.com/in/angela-santurbano/" target="_blank" rel="noopener">LinkedIn</a>
         <span class="note">Where the work conversations happen.</span></li>
