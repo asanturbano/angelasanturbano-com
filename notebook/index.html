@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Angela Santurbano</title>
+<meta name="description" content="Angela Santurbano is a builder PM who ships with AI. Projects, writing, and ways to reach out — in a notebook on a lamplit desk.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#241912">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vellum:#EFE9DC; --ink:#1B2433; --print:#3B3530;
+    --cloth:#1E2532; --brass:#B8934E;
+    /* a page is A5-ish; on a wide screen the spread fits side by side */
+    --page-w:min(32vw, 47vh);
+    --page-h:calc(var(--page-w) * 1.4);
+    --veil:.88;            /* vellum opacity: set by the lamp — more light, more show-through */
+  }
+  @media (orientation: portrait), (max-width: 760px){
+    :root{ --page-w:min(84vw, 62vh); }
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:#140D09}
+  body{font-family:'EB Garamond',serif;color:var(--print)}
+
+  /* the camera sits at the front of the desk, looking down at an angle */
+  #viewport{position:fixed;inset:0;overflow:hidden;perspective:1500px;perspective-origin:50% 45%}
+  #world{position:absolute;inset:0;transform-origin:50% 50%}
+
+  /* ---------- the desk: walnut, long grain ---------- */
+  #desk{position:absolute;inset:-60%;
+    background:
+      var(--grain),
+      repeating-linear-gradient(91deg, rgba(20,10,4,.12) 0 1px, rgba(0,0,0,0) 1px 6px, rgba(255,214,170,.035) 6px 7px, rgba(0,0,0,0) 7px 17px),
+      linear-gradient(178deg, #4A3424, #3E2B1E 45%, #4A3424 70%, #3A281C);
+  }
+
+  /* ---------- the lamp stands up off the desk, so it's drawn in screen space and
+                pinned each frame to its spot on the tilted desk (#lampAnchor) ---------- */
+  #lampAnchor{position:absolute;width:100px;height:100px;left:calc(var(--lamp-x) - 50px);top:calc(var(--lamp-y) - 50px);pointer-events:none}
+  #lamp{position:absolute;left:0;top:0;width:0;height:0;z-index:4;transform-origin:0 0;pointer-events:none}
+  #lamp svg{position:absolute;overflow:visible;left:0;top:0}
+  #lampBtn{position:absolute;border-radius:50%;border:0;background:transparent;cursor:pointer;pointer-events:auto}
+  #lampBtn:focus-visible{outline:2px solid #FFD9A0;outline-offset:6px}
+  #cord{position:absolute;inset:0;width:100%;height:100%;overflow:visible;z-index:1;pointer-events:none}
+
+  /* ---------- the notebook ---------- */
+  #book{position:absolute;z-index:2;
+    width:calc(var(--page-w) * 2);height:var(--page-h);
+    left:calc(50% - var(--page-w));top:calc(50% - var(--page-h) / 2);
+    perspective:2600px}
+  .shadow{position:absolute;top:0;height:100%;border-radius:4px;pointer-events:none;
+    box-shadow:var(--book-shadow)}
+  #shadowClosed{left:50%;width:50%;opacity:1}
+  #shadowOpen{left:0;width:100%;opacity:0}
+  .page{position:absolute;top:0;width:var(--page-w);height:var(--page-h);overflow:hidden}
+  .page.right{left:var(--page-w);border-radius:2px 4px 4px 2px;
+    /* the edges of the sheets beneath */
+    box-shadow:1px 1px 0 #E2DACA, 2px 2px 0 #D8CFBD, 3px 3px 0 #CEC4B0, 4px 3px 0 #C3B8A3}
+  .under, .sheet{position:absolute;inset:0}
+  .under{background:var(--vellum);padding:9% 11%}
+  .sheet{background:
+      linear-gradient(90deg, rgba(70,48,28,.16), rgba(70,48,28,0) 7%),
+      var(--fibers),
+      rgba(239,233,220,var(--veil))}
+  .left .sheet{background:
+      linear-gradient(270deg, rgba(70,48,28,.16), rgba(70,48,28,0) 7%),
+      var(--fibers),
+      var(--vellum)}
+  /* its own layer: Chrome otherwise rasterizes fine SVG strokes on a steeply tilted plane into a smear */
+  .ghost-title{width:46%;display:block;margin-bottom:6%;transform:translateZ(0)}
+  .ghost-lines p{font-size:calc(var(--page-w) * .032);line-height:1.5;margin-bottom:.7em;color:var(--print)}
+
+  #cover{position:absolute;left:var(--page-w);top:0;width:var(--page-w);height:var(--page-h);
+    transform-origin:0 50%;transform-style:preserve-3d;z-index:3}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .front{border-radius:3px 7px 7px 3px;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,236,206,.08), rgba(0,0,0,0) 70%),
+      var(--cloth-tex),
+      var(--cloth);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), inset -3px 0 0 rgba(0,0,0,.25)}
+  .front .band{position:absolute;top:-1px;bottom:-1px;right:9%;width:3.2%;background:#12161E;box-shadow:1px 0 2px rgba(0,0,0,.4)}
+  .front .mono{position:absolute;left:0;right:0;bottom:12%;text-align:center;
+    font-size:calc(var(--page-w) * .04);letter-spacing:.32em;color:rgba(0,0,0,.35);
+    text-shadow:0 1px 0 rgba(255,255,255,.06)}
+  .back{transform:rotateY(180deg)}
+  .back .sheet{border-radius:4px 2px 2px 4px}
+  .back .content{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 9%}
+  #name{width:100%;height:auto;overflow:visible}
+  .subtitle{margin-top:6%;text-align:center;font-style:italic;font-size:calc(var(--page-w) * .038);color:var(--print);letter-spacing:.01em}
+
+  #restingPen{position:absolute;z-index:3;overflow:visible;pointer-events:none;
+    left:var(--pen-x);top:var(--pen-y);width:1px;height:1px}
+
+  /* ---------- light: a multiply layer (falloff) and a screen layer (warmth) ---------- */
+  #light{position:absolute;inset:-60%;z-index:5;pointer-events:none;mix-blend-mode:multiply}
+  #glow{position:absolute;inset:-60%;z-index:6;pointer-events:none;mix-blend-mode:screen}
+
+  /* ---------- the dimmer, inline on the lamp cord ---------- */
+  #dimmer{position:absolute;z-index:7;left:var(--dim-x);top:var(--dim-y);transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;gap:6px}
+  #dimmer label{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,226,190,.62)}
+  .switch{background:linear-gradient(#2A221C,#16110D);border-radius:14px;padding:7px 12px;box-shadow:0 3px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.07)}
+  #lampLevel{-webkit-appearance:none;appearance:none;width:112px;height:22px;background:transparent;cursor:pointer;display:block}
+  #lampLevel::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:#0B0806;box-shadow:inset 0 1px 1px rgba(0,0,0,.8)}
+  #lampLevel::-moz-range-track{height:4px;border-radius:2px;background:#0B0806}
+  #lampLevel::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:22px;margin-top:-9px;border-radius:3px;
+    background:repeating-linear-gradient(0deg,#C9A35A 0 2px,#9C7A3C 2px 4px);box-shadow:0 1px 3px rgba(0,0,0,.6)}
+  #lampLevel::-moz-range-thumb{width:14px;height:22px;border:0;border-radius:3px;background:repeating-linear-gradient(0deg,#C9A35A 0 2px,#9C7A3C 2px 4px)}
+  #lampLevel:focus-visible{outline:2px solid #FFD9A0;outline-offset:6px;border-radius:4px}
+
+  #replay{position:fixed;z-index:9;left:50%;bottom:16px;transform:translateX(-50%);
+    font:italic 400 15px 'EB Garamond',serif;color:rgba(255,226,190,.6);background:none;border:0;cursor:pointer;
+    border-bottom:1px solid rgba(255,226,190,.25)}
+  #replay:hover{color:rgba(255,226,190,.9)}
+  #replay:focus-visible{outline:2px solid #FFD9A0;outline-offset:4px}
+
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/motion@12.4.7/dist/motion.js"></script>
+<script src="phrases.data.js"></script>
+<script src="ink.js"></script>
+</head>
+<body>
+<div id="viewport">
+  <div id="world">
+    <div id="desk"></div>
+    <svg id="cord" aria-hidden="true"><path fill="none" stroke="#120C08" stroke-width="5" stroke-linecap="round"/></svg>
+
+    <div id="book">
+      <div class="shadow" id="shadowClosed"></div>
+      <div class="shadow" id="shadowOpen"></div>
+      <section class="page right" aria-label="Contents">
+        <div class="under" aria-hidden="true">
+          <svg class="ghost-title" id="ghostTitle"></svg>
+          <div class="ghost-lines">
+            <p>The Coffee Houses of San Francisco</p>
+            <p>Neko Fortune Teller</p>
+            <p>Ancora</p>
+            <p>Fintech voice agent</p>
+            <p>Research synthesizer</p>
+          </div>
+        </div>
+        <div class="sheet"></div>
+      </section>
+      <div id="cover">
+        <div class="face front" aria-hidden="true"><div class="band"></div><div class="mono">A · S</div></div>
+        <div class="face back page left">
+          <div class="sheet"></div>
+          <div class="content">
+            <h1 class="sr-only">Angela Santurbano</h1>
+            <svg id="name" aria-hidden="true"></svg>
+            <p class="subtitle">builder who ships with AI · San Francisco</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <svg id="restingPen" aria-hidden="true"></svg>
+    <div id="lampAnchor"></div>
+    <div id="light"></div>
+    <div id="glow"></div>
+    <div id="dimmer">
+      <label for="lampLevel">Lamp</label>
+      <div class="switch"><input id="lampLevel" type="range" min="25" max="100" step="1" value="70" aria-valuetext="70 percent"></div>
+    </div>
+  </div>
+  <div id="lamp">
+    <svg id="lampArt" aria-hidden="true"></svg>
+    <button id="lampBtn" type="button" aria-label="Lamp: turn down"></button>
+  </div>
+</div>
+<button id="replay" type="button">watch it open</button>
+
+<script>
+(() => {
+  const M = window.Motion;
+  const { el } = window.Ink;
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+  const world = document.getElementById('world');
+  const cover = document.getElementById('cover');
+  const slider = document.getElementById('lampLevel');
+  const lampBtn = document.getElementById('lampBtn');
+  const light = document.getElementById('light'), glow = document.getElementById('glow');
+
+  /* ---------- textures, generated once ---------- */
+  const noise = (freq, oct, rgb, a, seed) => `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='${oct}' seed='${seed}'/><feColorMatrix values='0 0 0 0 ${rgb[0]}  0 0 0 0 ${rgb[1]}  0 0 0 0 ${rgb[2]}  0 0 0 ${a} 0'/></filter><rect width='300' height='300' filter='url(#f)'/></svg>`)}")`;
+  root.style.setProperty('--grain', noise('.003 .11', 3, [.08, .04, .02], .55, 7));
+  root.style.setProperty('--fibers', noise('.9 .06', 2, [.55, .5, .42], .2, 4));
+  root.style.setProperty('--cloth-tex', noise('.75', 2, [.02, .03, .05], .5, 9));
+
+  /* ---------- ink on the pages ---------- */
+  function inkSvg(svg, text, padX = 120, padY = 160){
+    const [x0, y0, x1, y1] = window.Ink.phrase(text).bbox;
+    svg.setAttribute('viewBox', `${x0 - padX} ${y0 - padY} ${x1 - x0 + padX * 2} ${y1 - y0 + padY * 2}`);
+    window.Ink.write(svg, text);
+  }
+  inkSvg(document.getElementById('name'), 'Angela Santurbano');
+  inkSvg(document.getElementById('ghostTitle'), 'Projects');
+
+  const isPortrait = () => matchMedia('(orientation: portrait), (max-width: 760px)').matches;
+  let L = 0.7;   // lamp level, 0.25..1
+  try { const saved = parseFloat(localStorage.getItem('notebook.lamp')); if (saved >= .25 && saved <= 1) L = saved; } catch (e) {}
+
+  function layout(){
+    const W = innerWidth, H = innerHeight, vmin = Math.min(W, H);
+    const portrait = isPortrait();
+    // Placed by where they should land on screen once the book is open; the world is
+    // shifted on phones (to center the left page), so subtract that shift.
+    const shift = openTargetX();
+    const lamp = portrait ? { x:W * .24 - shift, y:H * .22 } : { x:W * .19, y:H * .42 };   // the pool, under the shade
+    const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:H * .86 } : { x:Math.max(135, W * .14), y:H * .87 };   // below the book's near corner (the tilt spreads the near edge outward)
+    const penAt = portrait ? { x:W * .74 - shift, y:H * .84 } : { x:W / 2 + pageW() * 1.12, y:H * .58 };
+    root.style.setProperty('--lamp-x', `${lamp.x}px`); root.style.setProperty('--lamp-y', `${lamp.y}px`);
+    root.style.setProperty('--pen-x', `${penAt.x}px`); root.style.setProperty('--pen-y', `${penAt.y}px`);
+    root.style.setProperty('--dim-x', `${dim.x}px`); root.style.setProperty('--dim-y', `${dim.y}px`);
+
+    const u = pageW() / 360;                       // lamp proportions follow the notebook
+    const base = { x:-165 * u, y:-125 * u };       // the base sits behind and left of the pool
+    state.u = u; state.base = base;
+
+    // the cord: from the lamp base, through the dimmer, off the desk
+    const p = `M${lamp.x + base.x} ${lamp.y + base.y} C ${lamp.x + base.x - 40} ${lamp.y + H * .2}, ${dim.x + 60} ${dim.y - H * .22}, ${dim.x} ${dim.y} S ${dim.x - 30} ${H + 40}, ${dim.x - 80} ${H + 80}`;
+    document.querySelector('#cord path').setAttribute('d', p);
+
+    // resting pen, lit from the lamp: its shadow falls away from it
+    const pen = document.getElementById('restingPen');
+    pen.innerHTML = '';
+    const em = parseFloat(getComputedStyle(document.querySelector('.page')).width) * .82 / 8.7;
+    const s = em / 74;
+    const sh = el('g', { transform:`translate(${8 * s} ${12 * s}) rotate(-62) scale(${s})`, filter:'url(#penBlur)', opacity:.55 }, pen);
+    el('feGaussianBlur', { stdDeviation:3 }, el('filter', { id:'penBlur', x:'-20%', y:'-50%', width:'140%', height:'200%' }, el('defs', {}, pen)));
+    window.Ink.pen(sh, '#0E0805');
+    window.Ink.pen(el('g', { transform:`rotate(-62) scale(${s})` }, pen));
+
+    // the book's shadow falls away from the lamp
+    const vx = (W / 2) - lamp.x, vy = (H / 2) - lamp.y, n = Math.hypot(vx, vy);
+    root.style.setProperty('--book-shadow', `${(vx / n * 16).toFixed(1)}px ${(vy / n * 16).toFixed(1)}px 34px rgba(8,4,2,.6), ${(vx / n * 4).toFixed(1)}px ${(vy / n * 4).toFixed(1)}px 6px rgba(8,4,2,.5)`);
+    state.lamp = lamp; state.W = W; state.H = H;
+    applyLight();
+  }
+  const state = {};
+
+
+  /* ---------- the standing lamp ----------
+     An architect-style lamp built from 3D points (x across the desk, y toward the viewer,
+     z up), projected for the camera's current tilt and pinned to #lampAnchor's spot on
+     screen. The shade is a cone angled toward the notebook: unlike a dome, its outline
+     reads as a lamp from any angle. */
+  const lampEl = document.getElementById('lamp'), lampArt = document.getElementById('lampArt');
+  const anchor = document.getElementById('lampAnchor');
+  const v3 = {
+    add:(a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]],
+    mul:(a, k) => [a[0] * k, a[1] * k, a[2] * k],
+    norm:(a) => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; },
+    cross:(a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]],
+    dot:(a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
+  };
+  function hull(pts){
+    const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const q of p){ while (lo.length > 1 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (const q of p.reverse()){ while (up.length > 1 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+  const poly = (pts) => 'M' + pts.map(q => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(' L') + ' Z';
+
+  function drawLamp(){
+    if (!state.u) return;
+    const r = anchor.getBoundingClientRect(), k = r.width / 100;
+    lampEl.style.transform = `translate(${r.left + r.width / 2}px, ${r.top + r.height / 2}px) scale(${k})`;
+    const T = cam.tilt * Math.PI / 180, c = Math.cos(T), sn = Math.sin(T), u = state.u;
+    const P = (q) => [q[0], q[1] * c - q[2] * sn];
+    const camDir = [0, sn, c];
+    const g = lampArt; g.innerHTML = '';
+    const defs = el('defs', {}, g);
+    const grad = (id, stops, attrs) => { const lg = el(attrs.r ? 'radialGradient' : 'linearGradient', { id, ...attrs }, defs); stops.forEach(([o, col]) => el('stop', { offset:o, 'stop-color':col }, lg)); };
+    grad('brassCyl', [[0, '#5E4626'], [.35, '#C9A35A'], [.55, '#E6C988'], [1, '#6E5430']], { x1:0, x2:1, y1:0, y2:0 });
+    grad('brassTop', [[0, '#D8B66E'], [.5, '#B08A48'], [1, '#7A5E32']], { x1:0, y1:0, x2:1, y2:1 });
+    grad('enamel', [[0, '#465064'], [.4, '#222A3A'], [1, '#0A0D12']], { cx:'30%', cy:'25%', r:'95%' });
+    el('feGaussianBlur', { stdDeviation:6 * u }, el('filter', { id:'soft', x:'-50%', y:'-50%', width:'200%', height:'200%' }, defs));
+
+    // the weighted base, behind and to the left of the pool of light
+    const B = [-165 * u, -125 * u, 0], baseR = 52 * u, baseH = 15 * u;
+    const [bx0, by0] = P(B), [bx1, by1] = P([B[0], B[1], baseH]);
+    el('ellipse', { cx:bx0 + 6 * u, cy:by0 + 4 * u, rx:baseR * 1.2, ry:baseR * 1.2 * c + 2, fill:'rgba(6,3,1,.55)', filter:'url(#soft)' }, g);
+    el('path', { d:`M${bx1 - baseR} ${by1} L${bx0 - baseR} ${by0} A${baseR} ${baseR * c + .01} 0 0 0 ${bx0 + baseR} ${by0} L${bx1 + baseR} ${by1} Z`, fill:'url(#brassCyl)' }, g);
+    el('ellipse', { cx:bx1, cy:by1, rx:baseR, ry:baseR * c + .01, fill:'url(#brassTop)' }, g);
+    el('ellipse', { cx:bx1, cy:by1, rx:baseR * .78, ry:baseR * .78 * c + .01, fill:'none', stroke:'rgba(60,40,18,.45)', 'stroke-width':2 * u }, g);
+    el('ellipse', { cx:bx1 - 1.5 * u, cy:by1 - 1.5 * u, rx:baseR * .78, ry:baseR * .78 * c + .01, fill:'none', stroke:'rgba(255,236,190,.25)', 'stroke-width':1.2 * u }, g);
+
+    // the shade: a cone from a small top ring (A) to the open rim (R), aimed down at the book
+    const n = v3.norm([1, .55, -1.05]);
+    const R = [-5 * u, -5 * u, 150 * u], A = v3.add(R, v3.mul(n, -95 * u));
+    const e1 = v3.norm(v3.cross(n, [0, 0, 1])), e2 = v3.cross(n, e1);
+    const ring = (C, rad) => Array.from({ length:48 }, (_, i) => { const a = i / 48 * Math.PI * 2; return v3.add(C, v3.add(v3.mul(e1, Math.cos(a) * rad), v3.mul(e2, Math.sin(a) * rad))); });
+    const top = ring(A, 20 * u), rim = ring(R, 74 * u);
+
+    // jointed arm: base -> elbow -> the shade's top
+    const E = [B[0] + 25 * u, B[1] - 45 * u, 215 * u];
+    const seg = (a, b, w) => { const [x0, y0] = P(a), [x1, y1] = P(b); el('line', { x1:x0, y1:y0, x2:x1, y2:y1, stroke:'#A9873F', 'stroke-width':w, 'stroke-linecap':'round' }, g); };
+    seg([B[0], B[1], baseH], E, 8 * u);
+    seg(E, A, 7 * u);
+    for (const j of [[B[0], B[1], baseH], E]){ const [jx, jy] = P(j); el('circle', { cx:jx, cy:jy, r:8 * u, fill:'#C9A35A' }, g); }
+
+    // shade silhouette, its specular stripe, the cap, and the lamplit lip of the rim
+    const proj = (pts) => pts.map(P);
+    el('path', { d:poly(hull(proj(top).concat(proj(rim)))), fill:'url(#enamel)' }, g);
+    const key = v3.norm([-.5, -.6, .65]);
+    let best = 0, bestDot = -9;
+    for (let i = 0; i < 48; i++){ const d = v3.dot(v3.norm(v3.add(rim[i], v3.mul(R, -1))), key); if (d > bestDot){ bestDot = d; best = i; } }
+    const stripe = [-2, -1, 0, 1, 2].map(o => (best + o + 48) % 48);
+    el('path', { d:poly(stripe.map(i => P(top[i])).concat(stripe.slice().reverse().map(i => P(rim[i])))), fill:'rgba(255,236,206,.13)' }, g);
+    if (v3.dot(v3.mul(n, -1), camDir) > 0){
+      el('path', { d:poly(proj(top)), fill:'url(#brassTop)' }, g);
+      const [cx, cy] = P(A); el('circle', { cx, cy, r:5 * u, fill:'#7A5E32' }, g);
+    }
+    el('path', { d:poly(proj(rim)), fill:'none', stroke:'#B8934E', 'stroke-width':3 * u }, g);
+    const lip = rim.filter(q => q[2] < R[2] - 10 * u);
+    el('path', { d:'M' + proj(lip).map(q => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join(' L'), fill:'none',
+      stroke:`rgba(255,214,150,${(.25 + .6 * L).toFixed(2)})`, 'stroke-width':3 * u, 'stroke-linecap':'round', filter:L > .3 ? 'url(#soft)' : '' }, g);
+
+    // the lamp is lit by its own spill: darker as it's dimmed
+    lampArt.style.filter = `brightness(${(.6 + .4 * L).toFixed(3)})`;
+    // the click target covers the shade
+    const sh = proj(top.concat(rim)), xs = sh.map(q => q[0]), ys = sh.map(q => q[1]);
+    Object.assign(lampBtn.style, { left:`${Math.min(...xs)}px`, top:`${Math.min(...ys)}px`, width:`${Math.max(...xs) - Math.min(...xs)}px`, height:`${Math.max(...ys) - Math.min(...ys)}px` });
+  }
+
+  /* ---------- light model ---------- */
+  // Multiplier stops (r, g, b) at distances from the lamp, in fractions of the larger viewport side.
+  function stops(Lv){
+    const b2 = .72 + .22 * Lv, b3 = .22 + .3 * Lv;
+    return [
+      { d:0,                   c:[1, .96, .88] },
+      { d:.22 + .3 * Lv,       c:[.99, .93, .84] },
+      { d:.75 + .45 * Lv,      c:[b2, b2 * .9, b2 * .77] },
+      { d:1.1 + .3 * Lv,       c:[b3, b3 * .84, b3 * .7] }
+    ];
+  }
+  function multiplierAt(x, y, Lv){
+    const vmax = Math.max(state.W, state.H), d = Math.hypot(x - state.lamp.x, y - state.lamp.y) / vmax;
+    const st = stops(Lv);
+    for (let i = 1; i < st.length; i++){
+      if (d <= st[i].d){
+        const f = (d - st[i - 1].d) / (st[i].d - st[i - 1].d);
+        return st[i - 1].c.map((v, k) => v + (st[i].c[k] - v) * f);
+      }
+    }
+    return st[st.length - 1].c;
+  }
+  function applyLight(){
+    const vmax = Math.max(state.W, state.H);
+    // the overlays are inset -60%, so shift the center into their own coordinates
+    const ox = state.lamp.x + state.W * .6, oy = state.lamp.y + state.H * .6;
+    const css = stops(L).map(s => `rgb(${s.c.map(v => Math.round(v * 255)).join(',')}) ${Math.round(s.d * vmax)}px`).join(', ');
+    light.style.background = `radial-gradient(circle at ${ox}px ${oy}px, ${css})`;
+    const r1 = (.22 + .3 * L) * vmax;
+    glow.style.background = `radial-gradient(circle at ${ox}px ${oy}px, rgba(255,196,128,${(.3 * L).toFixed(3)}) 0, rgba(255,170,96,${(.1 * L).toFixed(3)}) ${Math.round(r1 * .7)}px, rgba(255,170,96,0) ${Math.round(r1 * 1.5)}px)`;
+    root.style.setProperty('--veil', (.93 - .08 * L).toFixed(3));
+    slider.value = Math.round(L * 100);
+    slider.setAttribute('aria-valuetext', `${Math.round(L * 100)} percent`);
+    lampBtn.setAttribute('aria-label', L > .3 ? 'Lamp: turn down' : 'Lamp: turn up');
+    drawLamp();
+  }
+
+  /* ---------- lamp controls ---------- */
+  const save = () => { try { localStorage.setItem('notebook.lamp', String(L)); } catch (e) {} };
+  let lastBright = L > .3 ? L : .7, lampAnim = null;
+  slider.addEventListener('input', () => { lampAnim && lampAnim.stop(); L = slider.value / 100; if (L > .3) lastBright = L; applyLight(); });
+  slider.addEventListener('change', save);
+  lampBtn.addEventListener('click', () => {
+    const to = L > .3 ? .25 : lastBright;
+    if (L > .3) lastBright = L;
+    lampAnim && lampAnim.stop();
+    if (!M || reduceMotion){ L = to; applyLight(); save(); return; }
+    // a filament: quick to brighten, slower to fade
+    lampAnim = M.animate(L, to, { duration:to > L ? .35 : .7, ease:'easeOut', onUpdate:(v) => { L = v; applyLight(); }, onComplete:save });
+  });
+
+  /* ---------- the cover opens; the camera pulls back and tilts to show the lamp ---------- */
+  const pageW = () => parseFloat(getComputedStyle(document.querySelector('.page')).width);
+  const CLOSE_SCALE = 1.22;
+  const tiltParam = parseFloat(new URLSearchParams(location.search).get('tilt'));
+  const TILT = () => !isNaN(tiltParam) ? tiltParam : (isPortrait() ? 22 : 32);
+  const cam = { x:0, scale:1, tilt:0 };
+  function openTargetX(){ return isPortrait() ? pageW() / 2 : 0; }
+  function applyCamera(){
+    world.style.transform = `translateX(${cam.x}px) scale(${cam.scale}) rotateX(${cam.tilt}deg)`;
+    drawLamp();
+  }
+  function setCamera(p){
+    // p: 0 = close and straight overhead on the closed cover, 1 = pulled back, tilted
+    const x0 = -CLOSE_SCALE * pageW() / 2, x1 = openTargetX();
+    cam.x = x0 + (x1 - x0) * p;
+    cam.scale = CLOSE_SCALE + (1 - CLOSE_SCALE) * p;
+    cam.tilt = TILT() * p;
+    applyCamera();
+  }
+  function setCover(open){
+    cover.style.transform = `rotateY(${open ? -180 : 0}deg)`;
+    document.getElementById('shadowClosed').style.opacity = open ? 0 : 1;
+    document.getElementById('shadowOpen').style.opacity = open ? 1 : 0;
+  }
+  let opening = [];
+  function open(){
+    opening.forEach(c => c.stop()); opening = [];
+    if (!M || reduceMotion){ setCover(true); setCamera(1); return; }
+    setCover(false); setCamera(0);
+    opening = [
+      M.animate(cover, { rotateY:[0, -180] }, { duration:1.15, delay:.45, ease:[.55, 0, .25, 1] }),
+      M.animate(0, 1, { duration:1.7, delay:.35, ease:[.45, 0, .2, 1], onUpdate:setCamera }),
+      M.animate('#shadowClosed', { opacity:[1, 0] }, { duration:.5, delay:.75 }),
+      M.animate('#shadowOpen', { opacity:[0, 1] }, { duration:.6, delay:1.1 })
+    ];
+    Promise.all(opening).then(() => { opening = []; });
+  }
+  // any click or key finishes the opening at once
+  const finish = () => {
+    if (!opening.length) return;
+    opening.forEach(c => c.stop()); opening = [];
+    setCover(true); setCamera(1);
+  };
+  addEventListener('keydown', finish);
+  document.getElementById('viewport').addEventListener('pointerdown', finish);
+  document.getElementById('replay').addEventListener('click', open);
+
+  addEventListener('resize', () => { layout(); if (!opening.length) setCamera(1); });
+
+  /* ---------- dev check: is every word readable at the dimmest lamp? (?debug) ---------- */
+  if (location.search.includes('debug')){
+    const lum = (c) => { const f = (v) => v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };
+    const hex = (h) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+    window.contrastReport = (Lv = .25) => {
+      // worst case over the whole left page, in desk coordinates
+      const pw = pageW(), ph = pw * 1.4, W = state.W, H = state.H;
+      const pts = [[W / 2 - pw, H / 2 - ph / 2], [W / 2, H / 2 - ph / 2], [W / 2 - pw, H / 2 + ph / 2], [W / 2, H / 2 + ph / 2]];
+      return [['name', '#1B2433'], ['subtitle', '#3B3530']].map(([what, color]) => {
+        let worst = 99;
+        for (const [x, y] of pts){
+          const m = multiplierAt(x, y, Lv);
+          const paper = hex('#EFE9DC').map((v, i) => v * m[i]), ink = hex(color).map((v, i) => v * m[i]);
+          worst = Math.min(worst, (lum(paper) + .05) / (lum(ink) + .05));
+        }
+        return `${what}: at least ${worst.toFixed(2)}:1 anywhere on the page at lamp ${Math.round(Lv * 100)}%`;
+      });
+    };
+  }
+
+  function start(){ layout(); open(); }
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(start);
+})();
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 ## The one-line brief
 
-A notebook open on a walnut desk under a single lamp, seen from straight above. A fountain pen writes Angela's name and a table of contents in blue-black ink on vellum; below it, the same pen draws Franklin in pen and ink. The visitor can turn the lamp up or down and switch on the rain. Everything about the craft should feel like a real desk on a real evening — and the work should be two clicks away for anyone in a hurry.
+A notebook open on a walnut desk under a single lamp, seen from the front of the desk at a gentle angle. A fountain pen writes Angela's name and a table of contents in blue-black ink on vellum; below it, the same pen draws Franklin in pen and ink. The visitor can turn the lamp up or down and switch on the rain. Everything about the craft should feel like a real desk on a real evening — and the work should be two clicks away for anyone in a hurry.
 
 ## Design principles
 
@@ -16,9 +16,11 @@ A notebook open on a walnut desk under a single lamp, seen from straight above. 
 
 ## The scene
 
-- **Camera:** straight down, no perspective, so writing stays flat and legible. The opening starts close on the closed notebook and pulls back once, as the cover opens, to reveal the lamp's pool. The camera doesn't move after that.
-- **Layout (desktop):** the open notebook sits centered; the lamp stands off the top-right corner, its pool spilling across the right page; a small radio sits in the bottom-left corner.
-- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time). The lamp is cropped by the top corner — only its pool and pull chain are visible — and the radio tucks into the bottom corner.
+- **Camera:** sitting at the front of the desk, looking down at about 32° from overhead (about 22° on phones) — enough to see that the lamp stands up off the desk, gentle enough that writing stays legible. The opening starts straight overhead and close on the closed notebook, then pulls back and tilts once, as the cover opens, revealing the lamp. The camera doesn't move after that. (For review, `?tilt=N` overrides the angle.)
+- **The lamp:** a brass architect's lamp — a beveled, weighted base behind and left of the notebook, a jointed arm, and a conical enamel shade (blue-black, like the ink) angled down toward the page, with lamplight catching the lip of its rim. A cone, not a dome: seen from above, a dome reads as a ball.
+- **Layout (desktop):** the open notebook sits centered. The lamp stands off the top-left corner — a right-handed writer keeps the lamp on the left so the hand doesn't shadow the page, and the pen comes in from the right. The lamp's cord runs down the left side of the desk, with the dimmer on it. The pen rests on the desk to the right of the notebook; a small radio will sit in the bottom-right corner.
+- **The spread:** the left side is the inside of the front cover, where the name is written — the way you'd write your name inside a new notebook. The first page, on the right, holds the contents.
+- **Layout (phone, portrait):** a single page fills the width (the notebook is shown one page at a time, starting with the name). The lamp sits in the top-left corner, the dimmer at the bottom left, and the radio will tuck into the bottom right.
 - **The ribbon bookmark:** a cloth ribbon hangs from the notebook's spine. On any section page, it is the way back to the contents (as are Esc and the browser's Back button).
 
 ## Color
@@ -35,7 +37,7 @@ A notebook open on a walnut desk under a single lamp, seen from straight above. 
 
 - Brightness ranges from 25% to 100%; the default is 70%. The dimmest setting is lamplight turned low, never darkness — body text stays at a contrast ratio of at least 4.5:1 at every setting.
 - Brightness changes three things together: the size and warmth of the light pool, how far the desk falls into shadow, and how much the vellum shows through (ghosted pages at about 6% opacity when dim, about 14% when bright).
-- Controls: pull the chain (click or tap toggles between the visitor's last setting and 25%), or drag the dimmer knob on the lamp's base. For keyboard and screen readers, the dimmer is a real slider with a label.
+- Controls: click or tap the lamp's shade to toggle between the visitor's last setting and 25%, or slide the dimmer on the lamp's cord. (A pull chain wouldn't read from the camera's angle, so the dimmer lives on the cord.) For keyboard and screen readers, the shade is a labeled button and the dimmer is a real slider with a label.
 - The setting is remembered in the visitor's browser.
 
 ## Paper (vellum)
