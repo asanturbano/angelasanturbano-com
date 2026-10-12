@@ -134,6 +134,7 @@
 </style>
 <script src="https://cdn.jsdelivr.net/npm/motion@12.4.7/dist/motion.js"></script>
 <script src="phrases.data.js"></script>
+<script src="franklin.data.js"></script>
 <script src="ink.js"></script>
 </head>
 <body>
@@ -442,7 +443,7 @@
   const NAME_MS = 1350;                        // the name's pen-down time at tempo 1
   const WRITE_DELAY = .15;                     // seconds after the cover is open and the camera has settled
   const DRY_MS = 1200, PEN_ANGLE = 38, REST_ANGLE = 72;   // at rest the pen lies upright in the margin
-  let ink = null, rows = [], penG = null, shadowG = null, penScale = 1, penPos = [0, 0];
+  let ink = null, rows = [], washes = [], penG = null, shadowG = null, penScale = 1, penPos = [0, 0];
 
   const toBook = (page, p) => page === 'right' ? [p[0] + pageW(), p[1]] : p;
   function restPos(){
@@ -472,10 +473,10 @@
     const sText = pw * .074 / 1000, sHead = sText * 1.1, sNum = sText * .85;
     const cP = Ink.phrase('Contents');
     jobs.push({ page:'right', tempo:TEXT_TEMPO, before:'contents', pause:isPortrait() ? 900 : 0,
-      strokes:Ink.prepare(rightInk, cP.strokes, { x:pw * .13 - cP.bbox[0] * sHead, y:ph * .17, s:sHead }).strokes });
+      strokes:Ink.prepare(rightInk, cP.strokes, { x:pw * .13 - cP.bbox[0] * sHead, y:ph * .15, s:sHead }).strokes });
     const left = pw * .15, right = pw * .86;
     ENTRIES.forEach((e, i) => {
-      const y = ph * (.31 + i * .1);
+      const y = ph * (.27 + i * .085);
       const tP = Ink.phrase(e.text), mP = Ink.phrase(e.num);
       const tW = (tP.bbox[2] - tP.bbox[0]) * sText, mW = (mP.bbox[2] - mP.bbox[0]) * sNum;
       const title = Ink.prepare(rightInk, tP.strokes, { x:left - tP.bbox[0] * sText, y, s:sText });
@@ -492,7 +493,7 @@
       // the entry itself is a real link over the row
       const li = document.createElement('li'), a = document.createElement('a');
       a.href = e.href; a.textContent = `${e.text}, section ${e.num}`;
-      Object.assign(a.style, { left:`${left - pw * .02}px`, top:`${y - ph * .065}px`, width:`${right - left + pw * .04}px`, height:`${ph * .085}px` });
+      Object.assign(a.style, { left:`${left - pw * .02}px`, top:`${y - ph * .058}px`, width:`${right - left + pw * .04}px`, height:`${ph * .075}px` });
       li.appendChild(a); toc.appendChild(li);
       rows.push({ a, x0:left, x1:left + tW, y:y + ph * .02, s:sText, underline:null });
       a.addEventListener('pointerenter', () => underline(i, true));
@@ -500,6 +501,12 @@
       a.addEventListener('focus', () => underline(i, true));
       a.addEventListener('blur', () => underline(i, false));
     });
+
+    // Franklin, drawn by the same pen under the contents; her washes bleed in after
+    const fH = ph * .37, fW = fH * (window.FRANKLIN.box[2] - window.FRANKLIN.box[0]) / (window.FRANKLIN.box[3] - window.FRANKLIN.box[1]);
+    const dog = Ink.franklin(rightInk, { x:(pw - fW) / 2, y:ph * .6, w:fW, id:'franklinWash' });
+    washes = dog.washes;
+    jobs.push({ page:'right', strokes:dog.strokes, fit:2600, after:'washes' });
 
     // the pen: drawn once, moved by placePen()
     penLayer.innerHTML = '';
@@ -516,6 +523,9 @@
     const W8 = calibrate(), segs = [], strokes = [], events = [];
     let t = 0, pos = restPos(), first = true;
     for (const job of jobs){
+      // a sketch fits a set time: quick hops between strokes, the rest shared by length and curvature
+      const hopMs = job.fit ? Math.min(18, job.fit * .3 / job.strokes.length) : 0;
+      const fitW = job.fit ? job.strokes.reduce((a, st) => a + st.tm.weight, 0) : 0;
       job.strokes.forEach((st, i) => {
         const to = toBook(job.page, Ink.start(st)), dist = Math.hypot(to[0] - pos[0], to[1] - pos[1]);
         let gap, lift;
@@ -524,6 +534,7 @@
           gap = 240 + dist * .9 + (job.pause || 0); lift = 1;
         }
         else if (job.hop){ gap = 24; lift = .25; }                          // dot to dot, quick taps
+        else if (job.fit){ gap = hopMs; lift = .2; }                        // sketching: barely lifting
         else {
           const sameWord = st.word === job.strokes[i - 1].word;
           gap = ((sameWord ? 55 : 140) + dist / st.s * .035) * Math.sqrt(job.tempo);   // a slow hand still lifts briskly
@@ -531,7 +542,7 @@
         }
         segs.push({ type:'move', from:pos, to, t0:t, t1:t += gap, lift, fromRest:first });
         first = false;
-        const dur = job.hop ? 30 : st.tm.weight * W8 * job.tempo;
+        const dur = job.hop ? 30 : job.fit ? st.tm.weight / fitW * (job.fit - hopMs * job.strokes.length) : st.tm.weight * W8 * job.tempo;
         st.t0 = t; st.t1 = t + dur;
         segs.push({ type:'write', st, page:job.page, t0:t, t1:t += dur });
         strokes.push(st);
@@ -579,6 +590,13 @@
   }
   let panAnim = null;
   function fire(name, instant){
+    if (name === 'washes'){
+      // lightest first, darkest last, each bleeding in as the one before settles
+      washes.forEach((w, i) => {
+        if (instant || !M || reduceMotion) w.setAttribute('opacity', 1);
+        else M.animate(w, { opacity:[0, 1] }, { duration:.7, delay:i * .4, ease:'easeOut' });
+      });
+    }
     if (name === 'contents' && isPortrait() && !instant && M && !reduceMotion){
       panAnim = M.animate(cam.x, finalX(), { duration:1, ease:[.45, 0, .2, 1], onUpdate:(v) => { cam.x = v; cam.targetX = v; applyCamera(); } });
     }
@@ -615,6 +633,7 @@
     cam.targetX = nameX();
     open();
     subtitle.style.opacity = 0;
+    washes.forEach((w) => { w.style.opacity = ''; w.setAttribute('opacity', 0); });
     ink.seg = 0; ink.ev = 0; render(0);
     setHint('skip');
     // the pen sets off once the cover is open and the camera has settled

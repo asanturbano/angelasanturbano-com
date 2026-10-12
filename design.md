@@ -75,7 +75,7 @@ Motion is the experience here, so it is choreographed as one timeline (built wit
 | 1.5–9.0s | The pen slowly writes "Angela Santurbano," then a short underline flourish. |
 | 9.0s | The printed subtitle fades in: *builder who ships with AI · San Francisco*. |
 | 9.3–11.7s | The pen writes, at the quicker tempo, "Contents" and the four entries, each with a dotted leader (the pen taps out each dot) and a lowercase roman numeral, i–iv — a cursive capital I reads as a J. Each entry becomes clickable as soon as it's written. |
-| 11.7–13.5s | The pen draws Franklin below the contents; ink washes bleed into her markings. |
+| 11.7–15.5s | The pen sketches Franklin below the contents (about 2.6s); her ink washes bleed in, lightest to darkest, as the pen goes back to rest. |
 | 13.5s | The pen comes to rest in the margin. |
 
 Any click or key during the opening finishes it instantly, and a small printed line at the foot of the desk — *click anywhere to skip* — fades in two seconds into the opening so first-time visitors know. Return visits land on the finished page; the same line then reads "watch it written" and replays the opening.
@@ -94,9 +94,9 @@ Any click or key during the opening finishes it instantly, and a small printed l
 ## Franklin
 
 - **Source:** the reference photo (`reference/franklin-photo.jpg`, local only and gitignored — never commit it) — mostly white coat, black ears and head markings, a dark patch on her side, mid-run toward the viewer with her tongue out.
-- **The drawing:** pen and ink with ink wash, in the same blue-black as the handwriting. A loose, confident outline — a few broken lines where fur breaks the edge — with her black markings (ears, eye patches, the patch on her side) laid in as diluted-ink washes with soft, feathered edges that bleed into the vellum. White fur is the paper itself. It sits below the contents at about a third of the page width.
-- **How it's made:** traced by hand from the reference photo — shapes taken from the photo's outlines, then cleaned up so it reads as drawn, not auto-traced. Only the finished SVG is committed.
-- **Drawing in:** the pen draws the outline first (about 0.8s), lifting where the line breaks; then the washes bleed outward, lightest first, darkest last (about 1.2s). A few quick fur strokes land at the end.
+- **The drawing:** pen and ink with ink wash, in the same blue-black as the handwriting. The outline is broken and furry — short strokes, frequent breaks, each ending in an outward flick, with loose wisps just outside the edge; the paws are drawn smooth. Her markings (both ears, the patch around her left eye, the streak down her right cheek, the patch on her side), her open mouth, and the shadows in her ruff are three crisp, graphic washes — light, mid, dark — with clean edges and only a hint of brushed wobble. White fur is the paper itself; the tongue takes a mid wash so it reads as part of her. She sits centered below the contents, about 30% of the page width.
+- **How it's made:** `tools/franklin.py` builds `notebook/franklin.data.js` from the reference photo. Her silhouette and face are traced by hand (coordinates in the script); inside the silhouette, the photo's tones are posterized into the three washes, embedded as small soft-edged alpha maps. The photo itself never enters the repo — only the drawing does.
+- **Drawing in:** the pen sketches her outline, then her face, in about 2.6s, barely lifting between strokes; then the washes bleed in, lightest first and darkest last, each starting as the one before settles (about 1.5s).
 - Franklin is the only image on the page. No second illustration gets this treatment.
 
 ## Sound

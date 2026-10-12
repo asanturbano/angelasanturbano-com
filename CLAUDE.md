@@ -38,7 +38,7 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
 - **Palette:** dark walnut desk, warm vellum, blue-black ink, a single warm lamp. No other light sources.
 - **Type:** handwriting (single-stroke script paths, animated) for short phrases only — name, contents entries, section titles, margin notes. Everything read at length is printed in EB Garamond.
 - **Motion:** one choreographed timeline, built with Motion. The pen writes like a real pen: steady speed, slower on curves, lifts between words.
-- **Franklin:** a pen-and-ink drawing with ink wash, traced from the reference photo (`reference/franklin-photo.jpg`, local only and gitignored — never commit it): mostly white coat, black ears and head markings, a dark patch on her side, running toward the viewer with her tongue out. Only the finished SVG drawing is committed.
+- **Franklin:** a pen-and-ink drawing with ink wash, traced from the reference photo (`reference/franklin-photo.jpg`, local only and gitignored — never commit it): mostly white coat, black ears and head markings, a dark patch on her side, running toward the viewer with her tongue out. `tools/franklin.py` turns the photo into the drawing (`notebook/franklin.data.js`); only the drawing is committed.
 
 ## Engineering rules
 

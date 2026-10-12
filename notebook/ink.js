@@ -119,6 +119,47 @@
     return g;
   }
 
+  // Franklin (from franklin.data.js), drawn `w` px wide with her top-left at (x, y).
+  // Pen strokes come back prepared (hidden) for the choreographer; washes come back as
+  // elements to fade in, softly distorted so their edges bleed like wet ink.
+  const UNITS = 25;   // drawing units per photo pixel: keeps the nib's width in proportion
+  function closedPath(p){
+    const n = p.length / 2, P = (i) => [p[2 * ((i + n) % n)], p[2 * ((i + n) % n) + 1]];
+    let d = `M${p[0]} ${p[1]}`;
+    for (let i = 0; i < n; i++){
+      const [x0, y0] = P(i - 1), [x1, y1] = P(i), [x2, y2] = P(i + 1), [x3, y3] = P(i + 2);
+      d += `C${(x1 + (x2 - x0) / 6).toFixed(1)} ${(y1 + (y2 - y0) / 6).toFixed(1)} ${(x2 - (x3 - x1) / 6).toFixed(1)} ${(y2 - (y3 - y1) / 6).toFixed(1)} ${x2} ${y2}`;
+    }
+    return d + 'Z';
+  }
+  function franklin(parent, { x = 0, y = 0, w = 200, id = 'wash' } = {}){
+    const F = window.FRANKLIN, [bx0, by0, bx1] = F.box, k = w / (bx1 - bx0);
+    const svg = parent.ownerSVGElement || parent;
+    let defs = svg.querySelector('defs') || el('defs', {}, svg);
+    if (!svg.querySelector(`#${id}`)){
+      const f = el('filter', { id, x:'-10%', y:'-10%', width:'120%', height:'120%' }, defs);
+      el('feTurbulence', { type:'fractalNoise', baseFrequency:.06, numOctaves:2, seed:3, result:'n' }, f);
+      // just enough wobble to read as brushed ink; the edges stay crisp and graphic
+      el('feDisplacementMap', { in:'SourceGraphic', in2:'n', scale:1.8, xChannelSelector:'R', yChannelSelector:'G' }, f);
+    }
+    const g = el('g', { transform:`translate(${x} ${y}) scale(${k}) translate(${-bx0} ${-by0})` }, parent);
+    const washG = el('g', { filter:`url(#${id})` }, g);
+    const [, , bx1b, by1b] = F.box;
+    // each wash: a sheet of diluted ink seen through a soft alpha map of where it pools
+    const washes = F.washes.map((w, i) => {
+      const mid = `${id}-m${i}`;
+      const m = el('mask', { id:mid, maskUnits:'userSpaceOnUse', x:bx0, y:by0, width:bx1b - bx0, height:by1b - by0 }, defs);
+      el('image', { href:w.src, x:bx0, y:by0, width:bx1b - bx0, height:by1b - by0, preserveAspectRatio:'none' }, m);
+      const wg = el('g', { opacity:0 }, washG);
+      el('rect', { x:bx0, y:by0, width:bx1b - bx0, height:by1b - by0, fill:INK_DRY, 'fill-opacity':w.strength, mask:`url(#${mid})` }, wg);
+      return wg;
+    });
+    const strokes = prepare(g, F.strokes.map((pts, i) => ({ pts:pts.map((v) => v * UNITS), word:i })), { s:1 / UNITS }).strokes;
+    // prepare() placed strokes in g's own coordinates; map nib positions back to the parent's
+    for (const st of strokes){ st.x = x - bx0 * k; st.y = y - by0 * k; st.s = k / UNITS; }
+    return { g, strokes, washes, h:(F.box[3] - by0) * k };
+  }
+
   // The fountain pen, tip at (0,0), barrel along +x, in px. Pass a flat color to draw its shadow.
   function pen(g, flat){
     const f = (c) => flat || c;
@@ -141,5 +182,5 @@
     return g;
   }
 
-  window.Ink = { NIB, INK_DRY, INK_WET, el, smoothPath, phrase, timing, prepare, at, start, end, show, write, pen };
+  window.Ink = { NIB, INK_DRY, INK_WET, el, smoothPath, phrase, timing, prepare, at, start, end, show, write, franklin, pen };
 })();
