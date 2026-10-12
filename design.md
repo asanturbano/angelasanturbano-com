@@ -46,9 +46,9 @@ A notebook open on a walnut desk under a single lamp, seen from straight above. 
 
 ## Handwriting and the pen
 
-- **Style:** relaxed modern cursive — connected, legible, unfussy. Not copperplate, not a signature scrawl.
-- **Technique:** each phrase is a set of single-stroke SVG paths, precomputed. The visible ink line is drawn with a broad nib held at a fixed angle (about 35°), so downstrokes run thick and side strokes thin, roughly 3:1.
-- **Speed:** about 10–12 letters per second — faster than a real hand, slow enough to read as writing. Pen lifts between words take 80–120ms. The i-dots and t-crosses come after the word, as a person would write them.
+- **Style:** EMS Brush, a single-stroke script derived from Alex Brush (SIL Open Font License) — flowing and connected, with a sweeping capital A. Chosen in the step 2 handwriting test over Capitol and Neato.
+- **Technique:** each phrase is a set of single-stroke SVG paths, precomputed. The visible ink line is drawn with a broad nib held at a fixed angle (about 35°), so downstrokes run thick and side strokes thin, roughly 5:1. The contrast should be visible at a glance, not just up close.
+- **Speed:** two tempos. **The name is the showpiece:** each stroke is written at a quarter of a brisk hand's speed, so "Angela Santurbano" takes about 7.5 seconds. Pen lifts between strokes stay natural (scaled by only half as much) — a slow writer forms letters slowly but doesn't hover between them. **Everything else** (contents, section titles, margin notes) is written at about 7 letters per second. The i-dots and t-crosses come after the word, as a person would write them.
 - **Ink behavior:** a small pooled dot where the nib first touches down; the line dries from wet to matte over about 1.2s.
 - **The pen:** a fountain pen, cap posted, nib touching the paper at the stroke's leading point, tilted toward the lower right. It casts a soft shadow that grows when the pen lifts. When it isn't writing, it rests in the margin.
 - **Hover and focus:** on a contents entry or link, the pen glides over and writes an underline beneath it (and erases nothing — the underline fades when focus leaves).
@@ -70,18 +70,18 @@ Motion is the experience here, so it is choreographed as one timeline (built wit
 |---|---|
 | 0.0s | Close on the closed notebook; the lamp is already on. |
 | 0.4–1.4s | The cover swings open; the camera pulls back to show the lamp's pool. |
-| 1.5–3.0s | The pen writes "Angela Santurbano," then a short underline flourish. |
-| 3.0s | The printed subtitle fades in: *builder who ships with AI · San Francisco*. |
-| 3.2–4.8s | The pen writes "Contents" and the four entries, each with a dotted leader and a Roman numeral. Each entry becomes clickable as soon as it's written. |
-| 4.8–6.0s | The pen draws Franklin below the contents; ink washes bleed into her markings. |
-| 6.0s | The pen comes to rest in the margin. |
+| 1.5–9.0s | The pen slowly writes "Angela Santurbano," then a short underline flourish. |
+| 9.0s | The printed subtitle fades in: *builder who ships with AI · San Francisco*. |
+| 9.3–11.7s | The pen writes, at the quicker tempo, "Contents" and the four entries, each with a dotted leader and a Roman numeral. Each entry becomes clickable as soon as it's written. |
+| 11.7–13.5s | The pen draws Franklin below the contents; ink washes bleed into her markings. |
+| 13.5s | The pen comes to rest in the margin. |
 
 Any click or key during the opening finishes it instantly. Return visits land on the finished page; a small printed "watch it written" link replays the opening.
 
 ### Everywhere else
 
 - **Opening a section:** the pen ticks the entry; the top sheet lifts (a soft spring, about 0.5s) and slides away up and to the left, its shadow widening as it rises. The section page beneath — already faintly visible — comes into full view.
-- **Section page:** the pen writes the title (about 0.6s), then printed lines fade up one after another, about 40ms apart.
+- **Section page:** the pen writes the title (about 0.9s), then printed lines fade up one after another, about 40ms apart.
 - **Returning to the contents:** the sheet lays back down, the reverse of the lift.
 - **Ambient motion** (barely noticeable — if a visitor can name the animation, it's too strong): a faint flicker in the lamp's filament, rain streaks in the window-light on the desk when the rain is on, the pen's slow idle sway in the margin.
 

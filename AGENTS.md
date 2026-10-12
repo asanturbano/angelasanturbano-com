@@ -8,7 +8,7 @@ This is a from-scratch redesign, developed on the `feature/notebook` branch. The
 
 ## The concept
 
-A notebook lies open on a wooden desk, seen from straight above. Beside it stands a desk lamp. On a first visit, the notebook's cover swings open and a fountain pen writes, in relaxed modern cursive and blue-black ink, my name and then a table of contents. Below the contents, the same pen draws Franklin — my dog — in pen and ink: her outline first, then washes of diluted ink bleeding into her black markings.
+A notebook lies open on a wooden desk, seen from straight above. Beside it stands a desk lamp. On a first visit, the notebook's cover swings open and a fountain pen writes, in a flowing cursive (EMS Brush) and blue-black ink, my name and then a table of contents. Below the contents, the same pen draws Franklin — my dog — in pen and ink: her outline first, then washes of diluted ink bleeding into her black markings.
 
 The pages are vellum: translucent, so the sheets underneath show faintly through. Each contents entry opens a section; the top sheet lifts away and the section page shows through, its title written by the pen and its body printed.
 

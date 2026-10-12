@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Handwriting Test</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --desk-dark:#241912; --desk-lit:#3A2A20;
+    --vellum:#EFE9DC; --ink:#1B2433; --ink-wet:#22304A;
+    --lamp:#FFD9A0; --print:#3B3530;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    min-height:100vh;color:var(--print);font-family:'EB Garamond',serif;
+    background:
+      radial-gradient(ellipse 70% 60% at 85% 0%, rgba(255,217,160,.22), rgba(255,217,160,0) 70%),
+      repeating-linear-gradient(97deg, rgba(0,0,0,.08) 0 2px, rgba(0,0,0,0) 2px 9px, rgba(255,220,180,.025) 9px 11px, rgba(0,0,0,0) 11px 23px),
+      linear-gradient(160deg, var(--desk-lit), var(--desk-dark) 70%);
+    background-attachment:fixed;
+    padding:clamp(16px,4vw,48px) 16px 64px;
+  }
+  header{max-width:960px;margin:0 auto 22px;color:#E9DDC8;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;justify-content:space-between}
+  h1{font-weight:500;font-size:15px;letter-spacing:.18em;text-transform:uppercase;font-variant:small-caps}
+  header p{font-size:16px;font-style:italic;color:rgba(233,221,200,.7);flex-basis:100%}
+  .controls{display:flex;gap:10px;align-items:center}
+  button,.toggle{
+    font:500 15px 'EB Garamond',serif;letter-spacing:.04em;color:var(--ink);
+    background:rgba(239,233,220,.92);border:0;border-radius:999px;padding:.45em 1.05em;cursor:pointer;
+  }
+  .toggle{display:inline-flex;align-items:center;gap:.5em}
+  .toggle input{accent-color:var(--ink)}
+  button:focus-visible,.toggle:focus-within{outline:2px solid var(--lamp);outline-offset:2px}
+
+  .sheet{position:relative;max-width:960px;margin:0 auto 34px}
+  /* the sheet beneath, ghosting through the vellum */
+  .sheet::before{
+    content:"";position:absolute;inset:6px -5px -7px 5px;border-radius:2px;
+    background:rgba(232,225,210,.55);
+    box-shadow:0 18px 40px -18px rgba(10,6,4,.7);
+  }
+  .vellum{
+    position:relative;border-radius:2px;padding:20px clamp(16px,3vw,32px) 18px;
+    background:
+      radial-gradient(ellipse 60% 90% at 92% 0%, rgba(255,236,206,.5), rgba(255,236,206,0) 65%),
+      var(--fibers),
+      rgba(239,233,220,.9);
+    box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 22px 50px -22px rgba(10,6,4,.8);
+    -webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px);
+  }
+  .ghost{position:absolute;right:clamp(16px,3vw,32px);bottom:16px;font-size:15px;font-style:italic;color:rgba(59,53,48,.12);pointer-events:none}
+  .label{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .label b{font-weight:500;font-size:15px;letter-spacing:.16em;text-transform:uppercase}
+  .label span{font-size:15px;font-style:italic;color:rgba(59,53,48,.7)}
+  .label button{background:transparent;border:1px solid rgba(27,36,51,.25);padding:.25em .9em;font-size:14px}
+  svg.writing{display:block;width:100%;height:auto;overflow:visible;margin:10px 0 2px}
+  .credit{max-width:960px;margin:8px auto 0;font-size:14px;color:rgba(233,221,200,.55);line-height:1.5}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/motion@12.4.7/dist/motion.js"></script>
+<script src="handwriting-test.data.js"></script>
+</head>
+<body>
+<header>
+  <h1>Handwriting test · step 2</h1>
+  <div class="controls">
+    <button id="all">Write all three</button>
+    <label class="toggle"><input type="checkbox" id="slow"> Slow motion (¼×)</label>
+  </div>
+  <p>Three relaxed cursive styles writing your name in blue-black ink. Watch the pen lift between strokes, slow through curves, and cross the t last.</p>
+</header>
+
+<main id="sheets"></main>
+
+<p class="credit">Single-stroke fonts by Evil Mad Scientist (gitlab.com/oskay/svg-fonts), derived from Sacramento (Brian J. Bonislawsky), Bad Script (Roman Shchyukin) and Alex Brush (Rob Leuschke), all under the SIL Open Font License.</p>
+
+<script>
+(() => {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const M = window.Motion;
+
+  // fibers in the vellum
+  const fibers = `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='.9 .06' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .42  0 0 0 .22 0'/></filter><rect width='240' height='240' filter='url(#f)'/></svg>`)}")`;
+  document.documentElement.style.setProperty('--fibers', fibers);
+
+  const STYLES = [
+    { key:'Brush',   name:'C · Brush',   note:'from Alex Brush — chosen' },
+    { key:'Capitol', name:'A · Capitol', note:'from Sacramento — for comparison' },
+    { key:'Neato',   name:'B · Neato',   note:'from Bad Script — for comparison' }
+  ];
+
+  /* ---- pen + ink settings (font units: 1000 per em) ---- */
+  const NIB_W = 64, NIB_ANGLE = -35 * Math.PI / 180, COPIES = 11, HAIRLINE = 15;   // about 5:1 thick to thin
+  const INK_DRY = [27, 36, 51], INK_WET = [34, 48, 74];
+  // Tempo multiplies every duration: 1 = brisk. The name is the showpiece and is written
+  // at a quarter speed; contents and titles will use 1.5 when the full page is built.
+  const TEMPO = 4;
+  const LIFT_TEMPO = Math.sqrt(TEMPO);   // a slow writer still lifts and moves on briskly
+  const WRITE_MS = 1350 * TEMPO;    // the whole name, pen-down time
+  const DRY_MS = 1200;
+
+  // Catmull-Rom through points -> smooth cubic path
+  function smoothPath(p){
+    const n = p.length / 2;
+    if (n < 2) return `M${p[0]} ${p[1]}`;
+    const P = i => [p[2 * Math.max(0, Math.min(n - 1, i))], p[2 * Math.max(0, Math.min(n - 1, i)) + 1]];
+    let d = `M${p[0]} ${p[1]}`;
+    for (let i = 0; i < n - 1; i++){
+      const [x0, y0] = P(i - 1), [x1, y1] = P(i), [x2, y2] = P(i + 1), [x3, y3] = P(i + 2);
+      d += `C${(x1 + (x2 - x0) / 6).toFixed(1)} ${(y1 + (y2 - y0) / 6).toFixed(1)} ${(x2 - (x3 - x1) / 6).toFixed(1)} ${(y2 - (y3 - y1) / 6).toFixed(1)} ${x2} ${y2}`;
+    }
+    return d;
+  }
+
+  // Time table for one stroke: slower through curves and at touch-down/lift-off.
+  function timing(p){
+    const n = p.length / 2, len = [0], w = [0];
+    for (let i = 1; i < n; i++){
+      const dx = p[2 * i] - p[2 * i - 2], dy = p[2 * i + 1] - p[2 * i - 1];
+      const ds = Math.hypot(dx, dy);
+      let turn = 0;
+      if (i > 1){
+        const a0 = Math.atan2(p[2 * i - 1] - p[2 * i - 3], p[2 * i - 2] - p[2 * i - 4]), a1 = Math.atan2(dy, dx);
+        turn = Math.abs(Math.atan2(Math.sin(a1 - a0), Math.cos(a1 - a0)));
+      }
+      len.push(len[i - 1] + ds);
+      w.push(ds + turn * 70);
+    }
+    const total = len[n - 1] || 1;
+    let acc = 0; const time = [0];
+    for (let i = 1; i < n; i++){
+      const f = len[i] / total, ends = (f < .08 || f > .92) ? 1.7 : 1;
+      acc += w[i] * ends; time.push(acc);
+    }
+    return { len, time, total, weight: acc || 1 };
+  }
+
+  function el(tag, attrs, parent){
+    const e = document.createElementNS(SVGNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    parent && parent.appendChild(e);
+    return e;
+  }
+
+  /* ---- the fountain pen: tip at (0,0), barrel along +x, drawn in px then scaled ---- */
+  function penShape(g, flat){
+    const f = (c) => flat || c;
+    el('path', { d:'M0 0 L13 -3.2 L28 -6.2 L33 -6.6 L33 6.6 L28 6.2 L13 3.2 Z', fill:f('#C8A45C') }, g);
+    if (!flat){
+      el('path', { d:'M1.5 0 L21 0', stroke:'#5A4420', 'stroke-width':.8 }, g);
+      el('circle', { cx:22, cy:0, r:1.3, fill:'#5A4420' }, g);
+      el('path', { d:'M4 -1 L26 -5', stroke:'rgba(255,240,200,.6)', 'stroke-width':.7 }, g);
+    }
+    el('path', { d:'M33 -6.6 L66 -7.6 L66 7.6 L33 6.6 Z', fill:f('#14171D') }, g);
+    el('rect', { x:66, y:-8, width:3.5, height:16, fill:f('#C8A45C') }, g);
+    el('rect', { x:69, y:-8.6, width:150, height:17.2, rx:3, fill:f('#1B2433') }, g);
+    el('rect', { x:196, y:-9.6, width:74, height:19.2, rx:9, fill:f('#161D2A') }, g);
+    if (!flat){
+      el('rect', { x:198, y:-9.6, width:4, height:19.2, fill:'#C8A45C' }, g);
+      el('path', { d:'M206 -9.6 L206 -12 L256 -12 Q260 -12 260 -9.6', fill:'none', stroke:'#C8A45C', 'stroke-width':2.2 }, g);
+      el('rect', { x:70, y:-6.8, width:190, height:2.2, rx:1, fill:'rgba(255,236,206,.22)' }, g);
+      el('rect', { x:34, y:-5.4, width:31, height:1.6, fill:'rgba(255,236,206,.18)' }, g);
+    }
+  }
+
+  function buildSheet(style){
+    const data = window.HANDWRITING[style.key], phrase = data.phrases[0];
+    const [x0, y0, x1, y1] = phrase.bbox;
+    const PAD = 420, vb = [x0 - PAD, y0 - 260, x1 - x0 + PAD * 2, y1 - y0 + 520];
+
+    const sheet = document.createElement('section');
+    sheet.className = 'sheet';
+    sheet.innerHTML = `<div class="vellum"><div class="label"><div><b>${style.name}</b> &nbsp;<span>${style.note}</span></div><button type="button">Replay</button></div></div>`;
+    document.getElementById('sheets').appendChild(sheet);
+    const vellum = sheet.querySelector('.vellum');
+    const ghost = document.createElement('div'); ghost.className = 'ghost'; ghost.textContent = 'Contents · I Projects · II Writing'; vellum.appendChild(ghost);
+
+    const svg = el('svg', { class:'writing', viewBox:vb.join(' '), role:'img', 'aria-label':'Angela Santurbano, handwritten' });
+    // keep the same em size across styles so they compare fairly
+    svg.style.maxWidth = `${vb[2] / 1000 * 74}px`;
+    vellum.appendChild(svg);
+    const defs = el('defs', {}, svg);
+    const blur = el('filter', { id:`b-${style.key}`, x:'-20%', y:'-20%', width:'140%', height:'140%' }, defs);
+    el('feGaussianBlur', { stdDeviation:40 }, blur);
+
+    const inkG = el('g', { fill:'none', 'stroke-linecap':'round', 'stroke-linejoin':'round' }, svg);
+    const ox = Math.cos(NIB_ANGLE) * NIB_W / 2, oy = Math.sin(NIB_ANGLE) * NIB_W / 2;
+
+    // strokes: K offset copies along the nib = a broad nib's thick and thin
+    const strokes = phrase.strokes.map((s) => {
+      const d = smoothPath(s.pts), g = el('g', { opacity:0 }, inkG);
+      const pool = el('circle', { cx:s.pts[0], cy:s.pts[1], r:NIB_W * .42, fill:'currentColor', stroke:'none' }, g);
+      const copies = [];
+      for (let k = 0; k < COPIES; k++){
+        const u = k / (COPIES - 1) * 2 - 1;
+        copies.push(el('path', { d, pathLength:1, 'stroke-dasharray':'1 1', 'stroke-dashoffset':1, 'stroke-width':HAIRLINE,
+          stroke:'currentColor', transform:`translate(${(u * ox).toFixed(1)} ${(u * oy).toFixed(1)})` }, g));
+      }
+      const ref = copies[COPIES >> 1];
+      return { g, copies, pool, ref, refLen:0, pts:s.pts, word:s.word, tm:timing(s.pts) };
+    });
+
+    const shadow = el('g', { filter:`url(#b-${style.key})` }, svg);
+    const shadowInner = el('g', {}, shadow); penShape(shadowInner, 'rgba(14,9,6,.42)');
+    const pen = el('g', {}, svg); const penInner = el('g', {}, pen); penShape(penInner);
+
+    /* ---- one timeline: write, lift, write ... ---- */
+    const totalWeight = strokes.reduce((a, s) => a + s.tm.weight, 0);
+    const segs = []; let t = 0;
+    const rest = [x1 + 380, y1 + 160];
+    const start0 = [strokes[0].pts[0], strokes[0].pts[1]];
+    segs.push({ type:'move', from:rest, to:start0, t0:t, t1:t += 700, lift:1 });
+    strokes.forEach((s, i) => {
+      const dur = s.tm.weight / totalWeight * WRITE_MS;
+      s.t0 = t; s.t1 = t + dur;
+      segs.push({ type:'write', s, t0:t, t1:t += dur });
+      const next = strokes[i + 1];
+      if (next){
+        const a = [s.pts[s.pts.length - 2], s.pts[s.pts.length - 1]], b = [next.pts[0], next.pts[1]];
+        const gap = ((next.word !== s.word ? 140 : 55) + Math.hypot(b[0] - a[0], b[1] - a[1]) * .035) * LIFT_TEMPO;
+        segs.push({ type:'move', from:a, to:b, t0:t, t1:t += gap, lift:next.word !== s.word ? 1 : .55 });
+      }
+    });
+    const last = strokes[strokes.length - 1];
+    segs.push({ type:'move', from:[last.pts[last.pts.length - 2], last.pts[last.pts.length - 1]], to:rest, t0:t, t1:t += 900, lift:1 });
+    const T = t + DRY_MS;
+
+    const PX = 1000 / 74;   // font units per css px at our em size
+    function placePen(x, y, lift){
+      const sc = PX * (1 + .05 * lift);
+      pen.setAttribute('transform', `translate(${x} ${y}) rotate(38) scale(${sc})`);
+      // the shadow meets the nib at the paper and drifts away as the pen lifts
+      shadow.setAttribute('transform', `translate(${x - 90 * lift} ${y + 140 * lift}) rotate(${44 + 4 * lift}) scale(${PX})`);
+      shadow.setAttribute('opacity', 1 - .35 * lift);
+    }
+    function lenAt(s, tt){
+      const tm = s.tm, target = (tt - s.t0) / (s.t1 - s.t0) * tm.weight;
+      let lo = 0, hi = tm.time.length - 1;
+      while (hi - lo > 1){ const mid = (lo + hi) >> 1; if (tm.time[mid] < target) lo = mid; else hi = mid; }
+      const span = tm.time[hi] - tm.time[lo] || 1, f = (target - tm.time[lo]) / span;
+      return (tm.len[lo] + (tm.len[hi] - tm.len[lo]) * f) / tm.total;
+    }
+    const mix = (a, b, f) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * f)).join(',')})`;
+
+    function render(tt){
+      for (const s of strokes){
+        if (tt < s.t0){ s.g.setAttribute('opacity', 0); continue; }
+        const frac = tt >= s.t1 ? 1 : lenAt(s, tt);
+        s.g.setAttribute('opacity', 1);
+        for (const c of s.copies) c.setAttribute('stroke-dashoffset', (1 - frac).toFixed(4));
+        const wet = tt < s.t1 ? 1 : Math.max(0, 1 - (tt - s.t1) / DRY_MS);
+        s.g.setAttribute('color', mix(INK_DRY, INK_WET, wet));
+      }
+      const seg = segs.find(g => tt >= g.t0 && tt < g.t1) || segs[segs.length - 1];
+      const f = Math.min(1, Math.max(0, (tt - seg.t0) / (seg.t1 - seg.t0)));
+      if (seg.type === 'write'){
+        const s = seg.s;
+        if (!s.refLen) s.refLen = s.ref.getTotalLength();
+        const p = s.ref.getPointAtLength(lenAt(s, tt) * s.refLen);
+        placePen(p.x, p.y, 0);
+      } else {
+        const e = f * f * (3 - 2 * f);
+        placePen(seg.from[0] + (seg.to[0] - seg.from[0]) * e, seg.from[1] + (seg.to[1] - seg.from[1]) * e, Math.sin(Math.PI * f) * seg.lift);
+      }
+    }
+
+    let ctl = null;
+    function play(){
+      ctl && ctl.stop();
+      if (!M){ render(T); return; }
+      render(0);
+      ctl = M.animate(0, T, { duration:T / 1000, ease:'linear', onUpdate:render });
+      ctl.speed = document.getElementById('slow').checked ? .25 : 1;
+    }
+    sheet.querySelector('button').addEventListener('click', play);
+    render(reduceMotion ? T : 0);
+    return { play, get ctl(){ return ctl; } };
+  }
+
+  const sheets = STYLES.map(buildSheet);
+  document.getElementById('all').addEventListener('click', () => sheets.forEach(s => s.play()));
+  document.getElementById('slow').addEventListener('change', (e) => {
+    sheets.forEach(s => { if (s.ctl) s.ctl.speed = e.target.checked ? .25 : 1; });
+  });
+  if (!reduceMotion) document.fonts.ready.then(() => sheets.forEach((s, i) => setTimeout(s.play, 400 + i * 350)));
+})();
+</script>
+</body>
+</html>
