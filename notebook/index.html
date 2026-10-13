@@ -58,12 +58,12 @@
     --vellum:#EFE9DC; --ink:#1B2433; --print:#3B3530;
     --cloth:#1E2532; --brass:#B8934E;
     /* a page is A5-ish; on a wide screen the spread fits side by side */
-    --page-w:min(37vw, 58vh);
+    --page-w:min(37vw, 58vh, calc((100vh - 150px) / 1.3));   /* and always room below for the arrow guide */
     --page-h:calc(var(--page-w) * 1.3);   /* a little squarer than A5, so the book fills the frame */
     --veil:.88;            /* vellum opacity: set by the lamp — more light, more show-through */
   }
   @media (orientation: portrait), (max-width: 760px){
-    :root{ --page-w:min(84vw, 48vh); }   /* by height too, so a short window keeps room for the lamp, radio and guide */
+    :root{ --page-w:min(84vw, 48vh, calc((100vh - 290px) / 1.3)); }   /* by height too, so a short screen keeps room for the lamp, radio, dimmer and guide */
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html,body{height:100%;overflow:hidden;overflow:clip;background:#140D09}
@@ -418,7 +418,7 @@
     const shift = finalX();
     const pwNow = pageW(), phNow = pwNow * 1.3;
     const lamp = portrait ? { x:W * .24 - shift, y:H * .22 } : { x:W * .19, y:H * .42 };   // the pool, under the shade
-    const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:H * .86 } : { x:Math.max(46, W * .05), y:H * .6 };    // in the left margin, along the cord (turned upright by CSS)
+    const dim = portrait ? { x:Math.max(96, W * .26) - shift, y:Math.min(H - 100, H / 2 + phNow / 2 + 48) } : { x:Math.max(46, W * .05), y:H * .6 };    // in the left margin, along the cord (turned upright by CSS)
     root.style.setProperty('--lamp-x', `${lamp.x}px`); root.style.setProperty('--lamp-y', `${lamp.y}px`);
     root.style.setProperty('--dim-x', `${dim.x}px`); root.style.setProperty('--dim-y', `${dim.y}px`);
     // the postcard: tucked under the front corner of the notebook, most of it showing
