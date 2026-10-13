@@ -55,7 +55,7 @@ The full guidelines live in `design.md`. Do not drift from them. In short:
   - `favicon.svg`, `apple-touch-icon.png`, `og.jpg` — icons and the share image (`?still` renders the finished desk for a new share image)
   - `night-market/` — the previous site, kept as it was, with its own favicon and share image and a link back in its About Me card
 - Handwriting is precomputed: a one-off script converts each fixed phrase into SVG stroke paths, and the output is committed. No font-to-path work at runtime.
-- Hosting: GitHub Pages from the public repo `asanturbano/angelasanturbano-com`, custom domain angelasanturbano.com. Pages serves the root of `main`. The repo is public, so anything pushed, including feature branches, is publicly visible.
+- Hosting: Cloudflare Pages, connected to the public repo `asanturbano/angelasanturbano-com`, serving the root of `main` at angelasanturbano.com (DNS is on Cloudflare too). Every push to `main` goes live within a minute or two, so push only what's been reviewed. The repo is public, so anything pushed, including feature branches, is publicly visible. Icons are cached hard by browsers: when an icon changes, bump the `?v=` on its link.
 - Every change must preserve:
   - real-text equivalents for everything handwritten or drawn
   - keyboard paths: Tab through the contents, Enter opens, the arrow keys turn pages, Esc returns to the contents, and the browser's Back button pages backward
@@ -75,6 +75,4 @@ All seven steps are done on `feature/notebook`: the design brief, the handwritin
 
 ## Going live
 
-Done (October 2026): the notebook is at the site root, the night market is at `/night-market/` with a link back, `noindex` is gone, and `feature/notebook` is merged into `main` and pushed.
-
-Still to do: turn on GitHub Pages (branch `main`, root), add the custom domain, and move DNS from WordPress; redirect any old WordPress URLs worth keeping.
+Done (October 2026): the notebook is at the site root, the night market is at `/night-market/` with a link back, `noindex` is gone, and `feature/notebook` is merged into `main` and pushed. The existing Cloudflare Pages project deploys it; GitHub Pages was tried and switched off.

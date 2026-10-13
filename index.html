@@ -9,8 +9,8 @@
 <meta name="theme-color" content="#241912">
 <meta name="author" content="Angela Santurbano">
 <link rel="canonical" href="https://angelasanturbano.com/">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 
 <!-- sharing: link previews on LinkedIn, X, Slack, iMessage -->
 <meta property="og:type" content="website">
@@ -697,7 +697,8 @@
   }
   radioBtn.addEventListener('click', (e) => { e.stopPropagation(); setSound(!Sound.on); });
   // the first touch, click or key press anywhere wakes the audio, so the pen is heard from then on
-  ['pointerdown', 'pointerup', 'touchend', 'keydown'].forEach((type) => addEventListener(type, Sound.wake, { capture:true, passive:true }));
+  // (browsers differ on which events allow sound: Safari counts a click or mouse-down, not a pointer-down)
+  ['pointerdown', 'mousedown', 'pointerup', 'touchend', 'click', 'keydown'].forEach((type) => addEventListener(type, Sound.wake, { capture:true, passive:true }));
   let soundWanted = false;
   try { soundWanted = localStorage.getItem('notebook.sound') === '1'; } catch (e) {}
   if (soundWanted){
