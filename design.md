@@ -84,7 +84,7 @@ Any click or key during the opening finishes it instantly, and a small printed l
 
 ### Everywhere else
 
-- **Turning forward:** from the contents, the pen first ticks the entry — the tick stays, marking it visited for the rest of the visit. Then the page turns right to left over the spine (about 0.85s), darkening as it rises away from the lamp; the page beneath, already faintly visible through the vellum, loses its frost. Jumping several pages riffles through them, each leaf a beat behind the last. From a contents link, keyboard focus moves to the section's heading; with the arrows, focus stays on the arrows and the new page is announced.
+- **Turning forward:** from the contents, the page turns right to left over the spine (about 0.85s), darkening as it rises away from the lamp; the page beneath, already faintly visible through the vellum, loses its frost. Jumping several pages riffles through them, each leaf a beat behind the last. From a contents link, keyboard focus moves to the section's heading; with the arrows, focus stays on the arrows and the new page is announced.
 - **Section page:** the content is printed (it was there all along, frosted under the contents); the pen writes the title the first time the page is opened, and it stays written after that. A list that runs past the page scrolls within it, its foot fading to say so.
 - **Addresses:** each section has its own (`#projects`, `#writing`, `#about`, `#reach-out`). A link straight to one skips the opening and lands on that page.
 - **Turning back:** the page turns back left to right — never floating in from elsewhere. Returning to the contents puts focus back on the entry you came from.
@@ -105,10 +105,10 @@ Any click or key during the opening finishes it instantly, and a small printed l
 
 ## Sound
 
-- Always off until the visitor turns it on with the radio. Nothing ever autoplays. A visitor who left it on last time hears it resume at their first click or key press — never before.
+- The music is always off until the visitor turns it on with the radio, and it never autoplays. A visitor who left it on last time hears it resume at their first click or key press, never before. The radio controls the music only.
 - **The radio:** a 1930s cathedral set (Philco 90 style) — walnut cabinet with a pointed gothic arch and bookmatched veneer, fretwork over a cloth grille, a small arched dial with a brass bezel, three bakelite knobs. It's drawn close to true scale — always about half a page wide, so it keeps its proportion to the notebook at any window size — standing just past the notebook's fore-edge and set back toward the top of the desk, so the frame crops its far side the way it crops the lamp. Its label sits on the open desk above the notebook, right-aligned against it, never over the page. On a phone it stands just behind the top corner of the page, its label beside it on the desk. Switched on, the dial lights amber, the grille glows faintly from the tubes behind it, and the needle moves. It's a real toggle button (`aria-pressed`) and remembers the choice.
 - **Music:** Satie's *Gymnopédie No. 1* (Robin Alciatore, Musopen — public domain, from Wikimedia Commons; see `audio/CREDITS.md`), 3:04, looped, as 96 kbps AAC (about 2.3 MB). It plays through a gentle valve-radio filter (a narrower, warmer band), fades in over about two seconds and out in under one. While it plays, the radio's label credits the recording.
-- **Pen scratch:** a faint nib-on-paper sound — bright, band-limited noise, generated — whose level follows the pen's speed, heard only while the nib is on the paper and only when sound is on.
+- **Pen scratch:** a faint nib-on-paper sound — bright, band-limited noise, generated — whose level follows the pen's speed, heard only while the nib is on the paper. It is always on, whatever the radio is doing; browsers allow no sound before the visitor's first click, tap or key press, so the opening on a first visit is written silently and the scratch is heard from then on (page turns, "watch it written").
 - Nothing audio loads until the radio is switched on; switched off, the music pauses once it has faded.
 
 ## Voice

@@ -632,7 +632,7 @@
   // Satie, Gymnopédie No. 1, played by Robin Alciatore — public domain via Musopen, from Wikimedia Commons
   const TRACK = { src:'audio/radio.m4a', credit:'Satie\'s Gymnopédie No. 1, played by Robin Alciatore (Musopen)' };
   const Sound = (() => {
-    let ctx = null, master = null, scratchGain = null, audio = null, pauseTimer = 0;
+    let ctx = null, music = null, scratchGain = null, audio = null, pauseTimer = 0;
     const api = { on:false };
     function noise(seconds){
       const n = Math.floor(ctx.sampleRate * seconds), b = ctx.createBuffer(1, n, ctx.sampleRate), out = b.getChannelData(0);
@@ -648,33 +648,38 @@
       return b;
     }
     const filter = (type, f, q = .7) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; return b; };
-    function build(){
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
-      // the music: one looping recording, through the radio's narrower, warmer voice
+    // the nib on paper is always heard; browsers only allow sound after the visitor's first touch,
+    // so the audio wakes then (api.wake), and the radio's switch governs the music alone
+    api.wake = () => {
+      if (!ctx){
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createBufferSource(); src.buffer = noise(3); src.loop = true;
+        scratchGain = ctx.createGain(); scratchGain.gain.value = 0;
+        src.connect(filter('highpass', 1800)).connect(filter('bandpass', 4200, 1.1)).connect(scratchGain).connect(ctx.destination);
+        src.start();
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+    };
+    // the music: one looping recording, through the radio's narrower, warmer voice; loaded only once the radio is first switched on
+    function tune(){
       audio = new Audio(TRACK.src);
       audio.loop = true; audio.preload = 'auto';
-      const music = ctx.createGain(); music.gain.value = .85;
-      ctx.createMediaElementSource(audio).connect(filter('highpass', 110)).connect(filter('lowpass', 6500)).connect(music).connect(master);
-      // the nib on paper
-      const src = ctx.createBufferSource(); src.buffer = noise(3); src.loop = true;
-      scratchGain = ctx.createGain(); scratchGain.gain.value = 0;
-      src.connect(filter('highpass', 1800)).connect(filter('bandpass', 4200, 1.1)).connect(scratchGain).connect(master);
-      src.start();
+      music = ctx.createGain(); music.gain.value = 0; music.connect(ctx.destination);
+      ctx.createMediaElementSource(audio).connect(filter('highpass', 110)).connect(filter('lowpass', 6500)).connect(music);
     }
     api.set = (on) => {
       api.on = on;
-      if (on && !ctx) build();
-      if (!ctx) return;
+      if (on){ api.wake(); if (!audio) tune(); }
+      if (!audio) return;
       clearTimeout(pauseTimer);
-      if (on){ ctx.resume(); audio.play().catch(() => {}); }
-      master.gain.setTargetAtTime(on ? .7 : 0, ctx.currentTime, on ? .6 : .2);
-      if (!on) pauseTimer = setTimeout(() => { audio.pause(); ctx.suspend(); }, 1500);   // let it fade, then rest
+      if (on) audio.play().catch(() => {});
+      music.gain.setTargetAtTime(on ? .6 : 0, ctx.currentTime, on ? .6 : .2);
+      if (!on) pauseTimer = setTimeout(() => audio.pause(), 1500);   // let it fade, then rest
     };
     // pen speed in px/ms; silent unless the nib is on the paper
     api.scratch = (speed) => {
-      if (!api.on || !ctx) return;
-      const t = ctx.currentTime, level = Math.min(1, speed / .35) * .32;
+      if (!ctx || ctx.state !== 'running') return;
+      const t = ctx.currentTime, level = Math.min(1, speed / .35) * .22;
       scratchGain.gain.cancelScheduledValues(t);
       scratchGain.gain.setTargetAtTime(level, t, .015);
       scratchGain.gain.setTargetAtTime(0, t + .09, .04);   // if the pen stops reporting, fall silent
@@ -691,6 +696,8 @@
     drawRadio();
   }
   radioBtn.addEventListener('click', (e) => { e.stopPropagation(); setSound(!Sound.on); });
+  // the first touch, click or key press anywhere wakes the audio, so the pen is heard from then on
+  ['pointerdown', 'pointerup', 'touchend', 'keydown'].forEach((type) => addEventListener(type, Sound.wake, { capture:true, passive:true }));
   let soundWanted = false;
   try { soundWanted = localStorage.getItem('notebook.sound') === '1'; } catch (e) {}
   if (soundWanted){
@@ -986,7 +993,7 @@
   /* ---------- pages: the contents and each section are leaves, turned like real pages ----------
      Leaf 0 is the contents; the sections lie beneath it in order. Going forward turns
      leaves right to left over the spine; going back turns them left to right. From the
-     contents, the pen ticks the entry first; it writes a section's title the first time. */
+     contents, the pen writes a section's title the first time it's opened. */
   // each section's content comes from the page's own markup (#content), so there's one source
   const SECTIONS = Object.fromEntries([...document.querySelectorAll('#content section')].map((sec) => [sec.dataset.id, {
     title:sec.dataset.title,
@@ -995,13 +1002,12 @@
   const ORDER = Object.keys(SECTIONS);
   const book = document.getElementById('book'), contentsLeaf = document.getElementById('contentsLeaf');
   const prevBtn = document.getElementById('prevPage'), nextBtn = document.getElementById('nextPage'), pager = document.getElementById('pager');
-  let leaves = [], at = 0, onFirst = false, turning = [], sectionRun = null, sectionBusy = false, ticks = {}, pending = null;
+  let leaves = [], at = 0, onFirst = false, turning = [], sectionRun = null, sectionBusy = false, pending = null;
   const written = new Set();
   const leafFor = (el) => ({ el, recto:el.querySelector('.recto'), verso:el.querySelector('.verso'), shades:el.querySelectorAll('.shade'), angle:0 });
 
   function buildSections(){
     document.querySelectorAll('.leaf.section').forEach((l) => l.remove());
-    ticks = {};
     leaves = [leafFor(contentsLeaf)];
     const pw = pageW(), ph = pw * 1.3, sHead = pw * .074 / 1000 * 1.25;
     ORDER.forEach((id) => {
@@ -1071,12 +1077,7 @@
     return Promise.all(turning).then(() => { turning = []; settle(); });
   }
 
-  function makeTick(i){
-    const row = rows[i], X = (row.x0 - pageW() * .055) / row.s;
-    return Ink.prepare(rightInk, [{ pts:[X, -150, X + 70, -40, X + 260, -380] }], { x:0, y:row.base, s:row.s }).strokes[0];
-  }
-
-  // open page `target` (0 = contents): tick, turn, write the title — as one pen timeline
+  // open page `target` (0 = contents): turn, then write the title — as one pen timeline
   function openPage(target, instant, keepFocus = false){
     if (playing()){ showFinished(); markSeen(); instant = true; }
     if (sectionRun){ sectionRun.stop(); sectionRun = null; }
@@ -1085,11 +1086,6 @@
     rows.forEach((r) => { if (r.underline){ r.underline.g.remove(); r.underline = null; } });
     if (onFirst){ onFirst = false; panTo(finalX()); }
     const from = at, id = target > 0 ? ORDER[target - 1] : null, jobs = [];
-    if (id && !ticks[id]){
-      ticks[id] = makeTick(target - 1);
-      if (from === 0) jobs.push({ page:'right', strokes:[ticks[id]], tempo:TEXT_TEMPO });   // the pen ticks it in front of you
-      else Ink.show(ticks[id], 1, 0);                                                     // otherwise it's simply marked
-    }
     jobs.push({ page:'right', strokes:[], after:'turn' });
     if (id && !written.has(id)) jobs.push({ page:'right', strokes:leaves[target].title.strokes, tempo:TEXT_TEMPO, pause:780, after:'written' });
     pending = { target, from, id, keepFocus };

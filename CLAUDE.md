@@ -15,7 +15,7 @@ The pages are vellum: translucent, so the sheets underneath show faintly through
 Visitors can make the desk their own:
 
 - **The lamp** — dim or brighten it (pull chain, or the dimmer on its base). More light makes the vellum more see-through.
-- **Music** — a 1930s cathedral radio on the desk plays Satie's *Gymnopédie No. 1* (a public-domain recording), and the pen's nib scratches faintly as it writes. Sound is always off until the visitor turns it on.
+- **Music** — a 1930s cathedral radio on the desk plays Satie's *Gymnopédie No. 1* (a public-domain recording), and the pen's nib scratches faintly as it writes. The radio controls the music only: music is off until the visitor turns it on, while the pen's scratch is always on (heard from the visitor's first click, tap or key press, since browsers allow no sound before that).
 
 Choices are remembered in the visitor's own browser. There is no choice screen at the door — the desk works with its defaults and the controls are part of the scene.
 
