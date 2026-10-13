@@ -19,19 +19,19 @@ Visitors can make the desk their own:
 
 Choices are remembered in the visitor's own browser. There is no choice screen at the door — the desk works with its defaults and the controls are part of the scene.
 
-## Content (the same as the live site — do not change without asking)
+## Content (do not change without asking)
 
-All of it lives in one place: the `#content` markup at the top of `notebook/index.html`. The notebook builds its pages from that markup, and search engines, link previews and visitors without JavaScript read it as an ordinary page. Edit content there and nowhere else.
+All of it lives in one place: the `#content` markup at the top of `notebook/index.html`. The notebook builds its pages from that markup, and search engines, link previews and visitors without JavaScript read it as an ordinary page. Edit content there and nowhere else. House style for the copy: first person, and no em dashes; use commas (or a full stop) instead.
 
 - **Projects**
-  - Solids app (solids-weld.vercel.app) — an app to help parents navigate introducing solids to your baby, starting at 6 months. *updated oct 2026*
+  - Solids app (solids-weld.vercel.app) — an app to help parents navigate introducing solids to their baby, starting at 6 months. *updated oct 2026*
   - The Coffee Houses of San Francisco (asanturbano.github.io/coffee-houses-sf) — my favorite SF coffee shops as a five-volume clothbound guide; a 3D bookshelf. *updated aug 2026*
   - Neko Fortune Teller (neko-fortune-teller.up.railway.app) — a grandmotherly maneki-neko reads your Four Pillars fortune; 3D, fully voiced. *updated aug 2026*
   - Ancora (ancora.coach) — practice hard conversations out loud with an AI coach.
-  - Fintech voice agent — a voice agent for financial services with evaluations built in for compliance (no link).
+  - Fintech voice agent (links to the Frontier Builds write-up, frontierbuilds.substack.com/p/i-built-a-customer-support-voice) — a voice agent for financial services with evaluations built in for compliance; demo on request.
   - Research synthesizer — point it at an arXiv paper plus your title and company; get the top product innovation, a competitive analysis, and the engineering effort (no link).
 - **Writing** — Frontier Builds (frontierbuilds.substack.com), Personal Lessons (angelasanturbano.substack.com), All the Angels (alltheangels.substack.com)
-- **About** — builder PM; ten years shipping payments and AI systems at Block / Square, Meta, Brex, and Cocoon; lately deep in voice AI; prototypes her own ideas with agentic coding tools; San Francisco. Franklin is mentioned by name.
+- **About** — written in first person: builder PM; ten years shipping payments and AI systems at Block / Square, Meta, Brex, and Cocoon; lately deep in voice AI; prototypes my own ideas with agentic coding tools; San Francisco. Franklin is mentioned by name.
 - **Reach out** — LinkedIn (linkedin.com/in/angela-santurbano), X (x.com/angelasanturb), subscribe to Frontier Builds
 
 ## Design system
