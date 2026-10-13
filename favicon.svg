@@ -1,19 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#1B1233"/>
-  <!-- ears (semi-erect, dark slate merle) -->
-  <path d="M8.6 13 L6.6 5.6 L13 9.6 Z" fill="#3B434F"/>
-  <path d="M23.4 13 L25.4 5.6 L19 9.6 Z" fill="#3B434F"/>
-  <path d="M7.4 6.8 L8.6 10.8 L10.4 8.8 Z" fill="#8A94A2"/>
-  <!-- head (silver-blue) -->
-  <path d="M8 13 Q16 8.5 24 13 Q25 21 19.5 26 Q16 27.6 12.5 26 Q7 21 8 13 Z" fill="#8A94A2"/>
-  <!-- tan cheek points -->
-  <path d="M9.6 17.5 Q11 20 12.8 21 Q11 21.8 9.6 20 Z" fill="#C0894E"/>
-  <path d="M22.4 17.5 Q21 20 19.2 21 Q21 21.8 22.4 20 Z" fill="#C0894E"/>
-  <!-- white blaze / muzzle -->
-  <path d="M14 12.4 Q16 10.8 18 12.4 L18.4 24 Q16 26.6 13.6 24 Z" fill="#FFF3E0"/>
-  <!-- almond eyes -->
-  <ellipse cx="12.3" cy="16.2" rx="1.7" ry="2" fill="#1E2229"/>
-  <ellipse cx="19.7" cy="16.2" rx="1.7" ry="2" fill="#1E2229"/>
-  <!-- nose -->
-  <ellipse cx="16" cy="22.4" rx="2" ry="1.5" fill="#1E2229"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- the desk's 1930s cathedral radio: walnut arch, cloth grille behind fretwork, a lit dial, three knobs -->
+  <defs>
+    <linearGradient id="w" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7A4529"/><stop offset="1" stop-color="#4A2816"/></linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="13" fill="#EFE9DC"/>
+  <path d="M13 57 L13 31 Q13 11 32 5 Q51 11 51 31 L51 57 Z" fill="url(#w)" stroke="#2E190E" stroke-width="1.6" stroke-linejoin="round"/>
+  <rect x="11" y="55" width="42" height="5" rx="1.2" fill="#2E190E"/>
+  <path d="M20.5 41 L20.5 28 Q20.5 15.5 32 12 Q43.5 15.5 43.5 28 L43.5 41 Z" fill="#D4BF95" stroke="#2E190E" stroke-width="1.4"/>
+  <path d="M26.5 41 L26.5 16 M32 41 L32 12.5 M37.5 41 L37.5 16" stroke="#4A2816" stroke-width="2"/>
+  <path d="M24 33 Q32 26 40 33" fill="none" stroke="#4A2816" stroke-width="1.6"/>
+  <rect x="25" y="44" width="14" height="5.5" rx="2.6" fill="#F2A65A" stroke="#C9A35A" stroke-width="1.2"/>
+  <circle cx="21.5" cy="52" r="2.6" fill="#1C0F08"/>
+  <circle cx="32" cy="52" r="2.6" fill="#1C0F08"/>
+  <circle cx="42.5" cy="52" r="2.6" fill="#1C0F08"/>
 </svg>

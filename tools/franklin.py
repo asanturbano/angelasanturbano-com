@@ -11,7 +11,7 @@ The photo stays out of the repo; only the drawing this writes is committed.
     Each wash is a small soft-edged alpha map, embedded as a PNG data URI.
 
 Usage:
-  python3 -I tools/franklin.py reference/franklin-photo.jpg > notebook/franklin.data.js
+  python3 -I tools/franklin.py reference/franklin-photo.jpg > franklin.data.js
 """
 import base64
 import io
